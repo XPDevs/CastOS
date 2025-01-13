@@ -83,217 +83,29 @@
             color: #d1d1e0;
             margin-top: 10px;
         }
-
-        /* Connectivity Status Box */
-        #status {
-            position: absolute;
-            top: 20px;
-            right: 20px;
-            width: 200px;
-            background: rgba(255, 255, 255, 0.8);
-            border-radius: 10px;
-            padding: 10px;
-            display: flex;
-            align-items: center;
-            justify-content: space-between;
-            box-shadow: 0 5px 15px rgba(0, 0, 0, 0.2);
-        }
-
-        #status span {
-            font-size: 16px;
-            font-weight: 600;
-            color: #3a3a5c;
-        }
-
-        /* Wi-Fi Icon CSS */
-        .wifi-icon {
-            width: 24px;
-            height: 24px;
-            position: relative;
-            background: transparent;
-        }
-
-        .wifi-icon::before, .wifi-icon::after {
-            content: '';
-            position: absolute;
-            border-radius: 50%;
-            border: 2px solid #3a3a5c;
-            width: 18px;
-            height: 18px;
-            left: 50%;
-            top: 50%;
-            transform: translate(-50%, -50%);
-        }
-
-        .wifi-icon::after {
-            border-radius: 5px;
-            width: 10px;
-            height: 10px;
-            top: 65%;
-        }
-
-        /* Creating connectivity state using CSS */
-        .wifi-connected {
-            width: 40px;
-            height: 40px;
-            border-radius: 50%;
-            background: #3a3a5c;
-            position: relative;
-            margin-right: 10px;
-        }
-
-        .wifi-connected::before, .wifi-connected::after {
-            content: '';
-            position: absolute;
-            border-radius: 50%;
-            background: #fff;
-            left: 50%;
-            transform: translateX(-50%);
-        }
-
-        .wifi-connected::before {
-            width: 30px;
-            height: 30px;
-            top: 10px;
-        }
-
-        .wifi-connected::after {
-            width: 18px;
-            height: 18px;
-            top: 22px;
-        }
-
-        /* Power button styles */
-        #power-button {
-            position: absolute;
-            top: 10px;
-            left: 10px;
-            width: 40px;
-            height: 40px;
-            background-color: #3a3a5c;
-            border-radius: 50%;
-            display: flex;
-            justify-content: center;
-            align-items: center;
-            cursor: pointer;
-            box-shadow: 0 5px 10px rgba(0, 0, 0, 0.3);
-        }
-
-        #power-button::before {
-            content: '⚡';
-            color: white;
-            font-size: 20px;
-        }
-
-        /* Modal styles */
-        #modal {
-            display: none;
-            position: fixed;
-            top: 0;
-            left: 0;
-            width: 100%;
-            height: 100%;
-            background-color: rgba(0, 0, 0, 0.6);
-            justify-content: center;
-            align-items: center;
-            z-index: 9999;
-        }
-
-        #modal-content {
-            background-color: #fff;
-            padding: 30px;
-            border-radius: 10px;
-            text-align: center;
-            box-shadow: 0 5px 15px rgba(0, 0, 0, 0.3);
-            width: 300px;
-        }
-
-        #modal-content h2 {
-            margin-bottom: 20px;
-        }
-
-        #modal-content button {
-            width: 45%;
-            padding: 10px;
-            margin: 10px;
-            font-size: 16px;
-            cursor: pointer;
-            border-radius: 5px;
-            border: none;
-        }
-
-        #cancel-btn {
-            background-color: #f1f1f1;
-        }
-
-        #restart-btn {
-            background-color: #3a3a5c;
-            color: white;
-        }
-
     </style>
     <script src="https://cdn.rawgit.com/davidshimjs/qrcodejs/gh-pages/qrcode.min.js"></script>
 </head>
 <body>
-    <div id="power-button" onclick="openModal()"></div>
-
-    <div id="status">
-        <span id="connection-status">Not Connected</span>
-        <div id="wifi-icon" class="wifi-icon"></div>
-    </div>
-
     <div id="container">
-        <h1>Cast Connection</h1>
-        <textarea id="offer" placeholder="Paste the offer from Peer 1 here"></textarea>
-        <button onclick="connect()">Generate Answer</button>
+        <h1>Peer Connection</h1>
+        <textarea id="offer" readonly>
+{"type":"offer","sdp":"v=0\r\no=- 9049414694198936057 2 IN IP4 127.0.0.1\r\ns=-\r\nt=0 0\r\na=group:BUNDLE 0\r\na=extmap-allow-mixed\r\na=msid-semantic: WMS\r\nm=application 9 UDP/DTLS/SCTP webrtc-datachannel\r\nc=IN IP4 0.0.0.0\r\na=candidate:451209423 1 udp 2113937151 f5711eab-92e4-4151-9d0c-91effd194689.local 49785 typ host generation 0 network-cost 999\r\na=ice-ufrag:/WEt\r\na=ice-pwd:gIr0Ktl7ikxBYPbJ+zZL8WtU\r\na=ice-options:trickle\r\na=fingerprint:sha-256 37:4D:01:01:5F:96:95:FB:4B:D7:4F:FD:D1:77:E0:29:42:04:08:7A:9B:31:40:3D:4F:DC:BE:A5:24:D5:3F:65\r\na=setup:actpass\r\na=mid:0\r\na=sctp-port:5000\r\na=max-message-size:262144\r\n"}
+        </textarea>
+        <button onclick="generateAnswer()">Generate Answer</button>
         <textarea id="answer" placeholder="Copy this and send to Peer 1" readonly></textarea>
         <div id="qr-code"></div>
         <p>Scan this QR code to copy the answer.</p>
     </div>
 
-    <!-- Modal -->
-    <div id="modal">
-        <div id="modal-content">
-            <h2>Are you sure you want to restart?</h2>
-            <button id="cancel-btn" onclick="closeModal()">Cancel</button>
-            <button id="restart-btn" onclick="restartPage()">Restart</button>
-        </div>
-    </div>
-
     <script>
-        let peerConnection;
-        let dataChannel;
-        const backgrounds = [
-            "images/bg1.jpg",
-            "images/bg2.jpg",
-            "images/bg3.jpg",
-            "images/bg4.jpg",
-            "images/bg5.jpg",
-        ];
-        let currentBackground = 0;
+        const predefinedOffer = {
+            type: "offer",
+            sdp: "v=0\r\no=- 9049414694198936057 2 IN IP4 127.0.0.1\r\ns=-\r\nt=0 0\r\na=group:BUNDLE 0\r\na=extmap-allow-mixed\r\na=msid-semantic: WMS\r\nm=application 9 UDP/DTLS/SCTP webrtc-datachannel\r\nc=IN IP4 0.0.0.0\r\na=candidate:451209423 1 udp 2113937151 f5711eab-92e4-4151-9d0c-91effd194689.local 49785 typ host generation 0 network-cost 999\r\na=ice-ufrag:/WEt\r\na=ice-pwd:gIr0Ktl7ikxBYPbJ+zZL8WtU\r\na=ice-options:trickle\r\na=fingerprint:sha-256 37:4D:01:01:5F:96:95:FB:4B:D7:4F:FD:D1:77:E0:29:42:04:08:7A:9B:31:40:3D:4F:DC:BE:A5:24:D5:3F:65\r\na=setup:actpass\r\na=mid:0\r\na=sctp-port:5000\r\na=max-message-size:262144\r\n"
+        };
 
-        // Rotate background images every 2 minutes
-        setInterval(() => {
-            currentBackground = (currentBackground + 1) % backgrounds.length;
-            document.body.style.backgroundImage = `url('${backgrounds[currentBackground]}')`;
-        }, 120000);
-
-        function connect() {
-            const offer = document.getElementById("offer").value.trim();
-            if (!offer) {
-                alert("Please paste the offer from Peer 1.");
-                return;
-            }
-
-            peerConnection = new RTCPeerConnection();
-
-            peerConnection.ondatachannel = (event) => {
-                dataChannel = event.channel;
-                dataChannel.onopen = () => {
-                    console.log("Data channel is open!");
-                    updateConnectionStatus(true);
-                };
-            };
+        function generateAnswer() {
+            const peerConnection = new RTCPeerConnection();
 
             peerConnection.onicecandidate = (event) => {
                 if (!event.candidate) {
@@ -304,7 +116,7 @@
             };
 
             peerConnection
-                .setRemoteDescription(JSON.parse(offer))
+                .setRemoteDescription(predefinedOffer)
                 .then(() => peerConnection.createAnswer())
                 .then((answer) => peerConnection.setLocalDescription(answer))
                 .catch((error) => console.error(error));
@@ -318,31 +130,6 @@
                 width: 128,
                 height: 128,
             });
-        }
-
-        function updateConnectionStatus(isConnected) {
-            const statusElement = document.getElementById("connection-status");
-            const wifiIcon = document.getElementById("wifi-icon");
-
-            if (isConnected) {
-                statusElement.textContent = "Connected";
-                wifiIcon.classList.add("wifi-connected");
-            } else {
-                statusElement.textContent = "Not Connected";
-                wifiIcon.classList.remove("wifi-connected");
-            }
-        }
-
-        function openModal() {
-            document.getElementById("modal").style.display = "flex";
-        }
-
-        function closeModal() {
-            document.getElementById("modal").style.display = "none";
-        }
-
-        function restartPage() {
-            location.reload();
         }
     </script>
 </body>
