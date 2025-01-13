@@ -3,7 +3,7 @@
 <head>
     <title>Peer 2 - Chromecast Style</title>
     <style>
-        /* Styling for Chromecast-like UI */
+        /* Existing styles */
         * {
             margin: 0;
             padding: 0;
@@ -162,10 +162,81 @@
             height: 18px;
             top: 22px;
         }
+
+        /* Power button styles */
+        #power-button {
+            position: absolute;
+            top: 10px;
+            left: 10px;
+            width: 40px;
+            height: 40px;
+            background-color: #3a3a5c;
+            border-radius: 50%;
+            display: flex;
+            justify-content: center;
+            align-items: center;
+            cursor: pointer;
+            box-shadow: 0 5px 10px rgba(0, 0, 0, 0.3);
+        }
+
+        #power-button::before {
+            content: '⚡';
+            color: white;
+            font-size: 20px;
+        }
+
+        /* Modal styles */
+        #modal {
+            display: none;
+            position: fixed;
+            top: 0;
+            left: 0;
+            width: 100%;
+            height: 100%;
+            background-color: rgba(0, 0, 0, 0.6);
+            justify-content: center;
+            align-items: center;
+            z-index: 9999;
+        }
+
+        #modal-content {
+            background-color: #fff;
+            padding: 30px;
+            border-radius: 10px;
+            text-align: center;
+            box-shadow: 0 5px 15px rgba(0, 0, 0, 0.3);
+            width: 300px;
+        }
+
+        #modal-content h2 {
+            margin-bottom: 20px;
+        }
+
+        #modal-content button {
+            width: 45%;
+            padding: 10px;
+            margin: 10px;
+            font-size: 16px;
+            cursor: pointer;
+            border-radius: 5px;
+            border: none;
+        }
+
+        #cancel-btn {
+            background-color: #f1f1f1;
+        }
+
+        #restart-btn {
+            background-color: #3a3a5c;
+            color: white;
+        }
+
     </style>
     <script src="https://cdn.rawgit.com/davidshimjs/qrcodejs/gh-pages/qrcode.min.js"></script>
 </head>
 <body>
+    <div id="power-button" onclick="openModal()"></div>
+
     <div id="status">
         <span id="connection-status">Not Connected</span>
         <div id="wifi-icon" class="wifi-icon"></div>
@@ -178,6 +249,15 @@
         <textarea id="answer" placeholder="Copy this and send to Peer 1" readonly></textarea>
         <div id="qr-code"></div>
         <p>Scan this QR code to copy the answer.</p>
+    </div>
+
+    <!-- Modal -->
+    <div id="modal">
+        <div id="modal-content">
+            <h2>Are you sure you want to restart?</h2>
+            <button id="cancel-btn" onclick="closeModal()">Cancel</button>
+            <button id="restart-btn" onclick="restartPage()">Restart</button>
+        </div>
     </div>
 
     <script>
@@ -227,37 +307,42 @@
                 .setRemoteDescription(JSON.parse(offer))
                 .then(() => peerConnection.createAnswer())
                 .then((answer) => peerConnection.setLocalDescription(answer))
-                .catch((error) => console.error("Error during connection:", error));
+                .catch((error) => console.error(error));
         }
 
-        function generateQRCode(answerText) {
+        function generateQRCode(answer) {
             const qrCodeContainer = document.getElementById("qr-code");
-
-            // Clear previous QR code
-            qrCodeContainer.innerHTML = '';
-
-            // Generate a new QR code
+            qrCodeContainer.innerHTML = "";
             new QRCode(qrCodeContainer, {
-                text: answerText,
-                width: 256,
-                height: 256,
-                colorDark: "#000000",
-                colorLight: "#ffffff",
-                correctLevel: QRCode.CorrectLevel.H,
+                text: answer,
+                width: 128,
+                height: 128,
             });
         }
 
         function updateConnectionStatus(isConnected) {
-            const statusText = document.getElementById("connection-status");
+            const statusElement = document.getElementById("connection-status");
             const wifiIcon = document.getElementById("wifi-icon");
 
             if (isConnected) {
-                statusText.textContent = "Connected";
+                statusElement.textContent = "Connected";
                 wifiIcon.classList.add("wifi-connected");
             } else {
-                statusText.textContent = "Not Connected";
+                statusElement.textContent = "Not Connected";
                 wifiIcon.classList.remove("wifi-connected");
             }
+        }
+
+        function openModal() {
+            document.getElementById("modal").style.display = "flex";
+        }
+
+        function closeModal() {
+            document.getElementById("modal").style.display = "none";
+        }
+
+        function restartPage() {
+            location.reload();
         }
     </script>
 </body>
