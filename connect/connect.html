@@ -20,6 +20,7 @@
             background-size: cover;
             background-position: center;
             color: #fff;
+            overflow: hidden; /* Ensure everything fits */
         }
 
         /* Header with connection status */
@@ -94,12 +95,60 @@
             cursor: pointer;
         }
 
+        /* QR Code overlay */
+        #qr-overlay {
+            display: none;
+            position: fixed;
+            top: 50%;
+            left: 50%;
+            transform: translate(-50%, -50%);
+            z-index: 20;
+            text-align: center;
+        }
+
+        #qr-code {
+            margin-bottom: 20px;
+        }
+
+        #qr-overlay p {
+            color: #fff;
+            font-size: 18px;
+        }
+
+        /* Modal styling */
+        #error-modal {
+            display: none;
+            position: fixed;
+            top: 50%;
+            left: 50%;
+            transform: translate(-50%, -50%);
+            background-color: rgba(0, 0, 0, 0.8);
+            color: #fff;
+            padding: 20px;
+            border-radius: 10px;
+            z-index: 100;
+            text-align: center;
+        }
+
+        #error-modal p {
+            font-size: 20px;
+        }
+
     </style>
+    <script src="https://cdn.rawgit.com/davidshimjs/qrcodejs/gh-pages/qrcode.min.js"></script>
     <script>
         let peerConnection;
         let dataChannel;
 
         function connect() {
+            const offer = document.getElementById("offer").value.trim();
+
+            // If offer is empty, show the error modal
+            if (!offer) {
+                showErrorModal("The offer field cannot be empty.");
+                return;
+            }
+
             peerConnection = new RTCPeerConnection();
 
             peerConnection.ondatachannel = (event) => {
@@ -116,12 +165,49 @@
                 }
             };
 
-            const offer = document.getElementById("offer").value.trim();
-            if (offer) {
-                peerConnection.setRemoteDescription(JSON.parse(offer))
-                    .then(() => peerConnection.createAnswer())
-                    .then(answer => peerConnection.setLocalDescription(answer));
-            }
+            // Try to set the remote description and create the answer
+            peerConnection.setRemoteDescription(JSON.parse(offer))
+                .then(() => peerConnection.createAnswer())
+                .then(answer => peerConnection.setLocalDescription(answer))
+                .then(() => {
+                    const answerText = document.getElementById("answer").value;
+                    showQRCode(answerText);
+                })
+                .catch((error) => {
+                    console.error("Error during connection:", error);
+                    showErrorModal("An error occurred while generating the answer. Please try again.");
+                });
+        }
+
+        function showQRCode(answerText) {
+            // Display the QR code overlay
+            document.getElementById("qr-overlay").style.display = 'block';
+
+            // Generate the QR code
+            const qrCode = new QRCode(document.getElementById("qr-code"), {
+                text: answerText,
+                width: 200,
+                height: 200,
+            });
+
+            // Optionally, add a message or instructions
+            document.getElementById("qr-overlay").innerHTML = `
+                <div id="qr-code"></div>
+                <p>Scan this QR code with your phone to copy the answer.</p>
+            `;
+        }
+
+        function showErrorModal(message) {
+            const modal = document.getElementById("error-modal");
+            modal.querySelector("p").textContent = message;
+            modal.style.display = 'block';
+
+            setTimeout(() => {
+                modal.style.display = 'none';
+                setTimeout(() => {
+                    window.location.href = "../index.html"; // Redirect to another HTML file
+                }, 2000);
+            }, 5000);
         }
     </script>
 </head>
@@ -137,6 +223,14 @@
         <textarea id="offer" placeholder="Paste the offer from Peer 1 here"></textarea>
         <button onclick="connect()">Generate Answer</button>
         <textarea id="answer" placeholder="Copy this and send to Peer 1" readonly></textarea>
+    </div>
+
+    <!-- QR Code Overlay (initially hidden) -->
+    <div id="qr-overlay"></div>
+
+    <!-- Error Modal (initially hidden) -->
+    <div id="error-modal">
+        <p>Something went wrong. Restarting.</p>
     </div>
 
 </body>
