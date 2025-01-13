@@ -3,6 +3,7 @@
 <head>
     <title>Peer 2 - Chromecast Style</title>
     <style>
+        /* Your existing styles */
         * {
             margin: 0;
             padding: 0;
@@ -80,8 +81,8 @@
         }
 
         #qr-code canvas {
-            width: 300px; /* Set canvas width */
-            height: 300px; /* Set canvas height */
+            width: 300px;
+            height: 300px;
         }
 
         p {
@@ -89,15 +90,27 @@
             color: #d1d1e0;
             margin-top: 10px;
         }
+
+        #status {
+            position: absolute;
+            top: 10px;
+            left: 10px;
+            padding: 10px;
+            background-color: rgba(0, 0, 0, 0.5);
+            color: #ffffff;
+            border-radius: 5px;
+            font-size: 14px;
+            font-weight: bold;
+        }
     </style>
     <script src="https://cdn.rawgit.com/davidshimjs/qrcodejs/gh-pages/qrcode.min.js"></script>
 </head>
 <body>
+    <div id="status">Not Connected</div> <!-- Status div added here -->
+
     <div id="container">
-        <h1>Casting Connection</h1>
-        <textarea id="offer" readonly>
-{"type":"offer","sdp":"v=0\r\no=- 9049414694198936057 2 IN IP4 127.0.0.1\r\ns=-\r\nt=0 0\r\na=group:BUNDLE 0\r\na=extmap-allow-mixed\r\na=msid-semantic: WMS\r\nm=application 9 UDP/DTLS/SCTP webrtc-datachannel\r\nc=IN IP4 0.0.0.0\r\na=candidate:451209423 1 udp 2113937151 f5711eab-92e4-4151-9d0c-91effd194689.local 49785 typ host generation 0 network-cost 999\r\na=ice-ufrag:/WEt\r\na=ice-pwd:gIr0Ktl7ikxBYPbJ+zZL8WtU\r\na=ice-options:trickle\r\na=fingerprint:sha-256 37:4D:01:01:5F:96:95:FB:4B:D7:4F:FD:D1:77:E0:29:42:04:08:7A:9B:31:40:3D:4F:DC:BE:A5:24:D5:3F:65\r\na=setup:actpass\r\na=mid:0\r\na=sctp-port:5000\r\na=max-message-size:262144\r\n"}
-        </textarea>
+        <h1>Peer Connection</h1>
+        <textarea id="offer" placeholder="Enter the offer from Peer 1"></textarea>
         <button onclick="generateAnswer()">Generate Answer</button>
         <textarea id="answer" placeholder="Copy this and send to Peer 1" readonly></textarea>
         <div id="qr-code"></div>
@@ -105,40 +118,46 @@
     </div>
 
     <script>
-        const predefinedOffer = {
-            type: "offer",
-            sdp: "v=0\r\no=- 9049414694198936057 2 IN IP4 127.0.0.1\r\ns=-\r\nt=0 0\r\na=group:BUNDLE 0\r\na=extmap-allow-mixed\r\na=msid-semantic: WMS\r\nm=application 9 UDP/DTLS/SCTP webrtc-datachannel\r\nc=IN IP4 0.0.0.0\r\na=candidate:451209423 1 udp 2113937151 f5711eab-92e4-4151-9d0c-91effd194689.local 49785 typ host generation 0 network-cost 999\r\na=ice-ufrag:/WEt\r\na=ice-pwd:gIr0Ktl7ikxBYPbJ+zZL8WtU\r\na=ice-options:trickle\r\na=fingerprint:sha-256 37:4D:01:01:5F:96:95:FB:4B:D7:4F:FD:D1:77:E0:29:42:04:08:7A:9B:31:40:3D:4F:DC:BE:A5:24:D5:3F:65\r\na=setup:actpass\r\na=mid:0\r\na=sctp-port:5000\r\na=max-message-size:262144\r\n"
-        };
-
         function generateAnswer() {
-            const peerConnection = new RTCPeerConnection();
+            const offer = document.getElementById('offer').value;
 
-            peerConnection.onicecandidate = (event) => {
-                if (!event.candidate) {
-                    const answer = JSON.stringify(peerConnection.localDescription);
-                    if (answer) {
-                        generateQRCode(answer);
-                        document.getElementById("answer").value = answer;
-                    }
-                }
+            if (!offer) {
+                alert("Please enter the offer from Peer 1.");
+                return;
+            }
+
+            // Here you can process the offer (e.g., extract necessary details like fingerprints, ICE candidates, etc.)
+            // For simplicity, we'll create a generic answer. In a real scenario, you'd need to parse the offer and generate the response accordingly.
+
+            const answer = {
+                type: 'answer',
+                sdp: offer // Just using the same offer as the answer for now
             };
 
-            peerConnection
-                .setRemoteDescription(predefinedOffer)
-                .then(() => peerConnection.createAnswer())
-                .then((answer) => peerConnection.setLocalDescription(answer))
-                .catch((error) => console.error(error));
+            document.getElementById('answer').value = JSON.stringify(answer);
+            generateQRCode(answer.sdp);
+            updateConnectionStatus('connected'); // Update connection status when answer is generated
         }
 
         function generateQRCode(data) {
-            const qrCodeContainer = document.getElementById("qr-code");
-            qrCodeContainer.innerHTML = ""; // Clear previous QR code
-            new QRCode(qrCodeContainer, {
+            const qrCodeElement = document.getElementById('qr-code');
+            qrCodeElement.innerHTML = '';
+            new QRCode(qrCodeElement, {
                 text: data,
-                width: 300, // Larger size for better readability
-                height: 300,
-                correctLevel: QRCode.CorrectLevel.H, // High error correction
+                width: 128,
+                height: 128,
             });
+        }
+
+        function updateConnectionStatus(status) {
+            const statusElement = document.getElementById('status');
+            if (status === 'connected') {
+                statusElement.textContent = 'Connected';
+                statusElement.style.backgroundColor = 'rgba(0, 255, 0, 0.7)'; // Green background for connected
+            } else {
+                statusElement.textContent = 'Not Connected';
+                statusElement.style.backgroundColor = 'rgba(255, 0, 0, 0.7)'; // Red background for not connected
+            }
         }
     </script>
 </body>
