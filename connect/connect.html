@@ -1,9 +1,9 @@
 <!DOCTYPE html>
 <html>
 <head>
-    <title>Peer 2</title>
+    <title>Peer 2 - Chromecast Style</title>
     <style>
-        /* Reset default styles */
+        /* Styling for Chromecast-like UI */
         * {
             margin: 0;
             padding: 0;
@@ -11,141 +11,197 @@
         }
 
         body {
-            font-family: Arial, sans-serif;
+            font-family: 'Roboto', Arial, sans-serif;
+            background: url('images/bg1.jpg') no-repeat center center/cover;
+            color: #ffffff;
+            display: flex;
+            justify-content: center;
+            align-items: center;
             height: 100vh;
-            display: flex;
-            flex-direction: column;
-            justify-content: flex-end;
-            background-image: url('images/bg.jpg'); /* Corrected path for local background image */
-            background-size: cover;
-            background-position: center;
-            color: #fff;
-            overflow: hidden; /* Ensure everything fits */
-        }
-
-        /* Header with connection status */
-        #header {
-            display: flex;
-            align-items: center;
-            justify-content: flex-start;
-            padding: 10px;
-            position: absolute;
-            top: 10px;
-            left: 10px;
-        }
-
-        #status {
-            margin-left: 10px;
-            font-size: 16px;
-        }
-
-        .wifi-icon {
-            width: 20px;
-            height: 20px;
-            margin-right: 5px;
-        }
-
-        /* Settings at the center of the bottom in a row */
-        #offer-container {
-            padding: 10px;
-            background-color: rgba(0, 0, 0, 0.8);
-            border-radius: 5px;
-            display: flex;
-            justify-content: space-between;
-            align-items: center;
-            width: 90%;
-            max-width: 600px;
-            position: fixed;
-            bottom: 20px;
-            left: 50%;
-            transform: translateX(-50%);
-            z-index: 10;
-        }
-
-        /* Each block inside the settings container */
-        .settings-block {
-            margin: 0 5px;
-            padding: 10px;
-            background-color: #333;
-            color: #fff;
-            border-radius: 5px;
             text-align: center;
-            width: 80px;
-            cursor: pointer;
+            position: relative;
+            overflow: hidden;
+        }
+
+        #container {
+            width: 90%;
+            max-width: 500px;
+            background: rgba(255, 255, 255, 0.1);
+            border-radius: 15px;
+            padding: 30px;
+            box-shadow: 0 10px 30px rgba(0, 0, 0, 0.5);
+        }
+
+        h1 {
+            font-size: 24px;
+            font-weight: 400;
+            margin-bottom: 20px;
+            text-transform: uppercase;
         }
 
         textarea {
-            padding: 10px;
-            font-size: 14px;
-            border-radius: 5px;
-            margin-bottom: 10px;
             width: 100%;
-            max-width: 100%;
-            background-color: #fff;
-            color: #333;
-            border: 1px solid #ddd;
+            margin: 10px 0;
+            padding: 15px;
+            font-size: 14px;
+            border: none;
+            border-radius: 10px;
+            background: rgba(255, 255, 255, 0.2);
+            color: #ffffff;
+            outline: none;
+            resize: none;
         }
 
         button {
-            padding: 10px;
-            background-color: #007bff;
-            color: white;
-            border-radius: 5px;
+            width: 100%;
+            padding: 15px;
+            margin: 20px 0;
+            background: #ffffff;
+            color: #3a3a5c;
             border: none;
+            border-radius: 10px;
+            font-size: 16px;
+            font-weight: 600;
             cursor: pointer;
+            transition: all 0.3s ease;
         }
 
-        /* QR Code overlay */
-        #qr-overlay {
-            display: none;
-            position: fixed;
-            top: 50%;
-            left: 50%;
-            transform: translate(-50%, -50%);
-            z-index: 20;
-            text-align: center;
+        button:hover {
+            background: #f1f1f1;
         }
 
         #qr-code {
-            margin-bottom: 20px;
-        }
-
-        #qr-overlay p {
-            color: #fff;
-            font-size: 18px;
-        }
-
-        /* Modal styling */
-        #error-modal {
-            display: none;
-            position: fixed;
-            top: 50%;
-            left: 50%;
-            transform: translate(-50%, -50%);
-            background-color: rgba(0, 0, 0, 0.8);
-            color: #fff;
-            padding: 20px;
+            margin: 20px auto;
+            background: #ffffff;
             border-radius: 10px;
-            z-index: 100;
-            text-align: center;
+            padding: 10px;
+            display: inline-block;
         }
 
-        #error-modal p {
-            font-size: 20px;
+        p {
+            font-size: 14px;
+            color: #d1d1e0;
+            margin-top: 10px;
         }
 
+        /* Connectivity Status Box */
+        #status {
+            position: absolute;
+            top: 20px;
+            right: 20px;
+            width: 200px;
+            background: rgba(255, 255, 255, 0.8);
+            border-radius: 10px;
+            padding: 10px;
+            display: flex;
+            align-items: center;
+            justify-content: space-between;
+            box-shadow: 0 5px 15px rgba(0, 0, 0, 0.2);
+        }
+
+        #status span {
+            font-size: 16px;
+            font-weight: 600;
+            color: #3a3a5c;
+        }
+
+        /* Wi-Fi Icon CSS */
+        .wifi-icon {
+            width: 24px;
+            height: 24px;
+            position: relative;
+            background: transparent;
+        }
+
+        .wifi-icon::before, .wifi-icon::after {
+            content: '';
+            position: absolute;
+            border-radius: 50%;
+            border: 2px solid #3a3a5c;
+            width: 18px;
+            height: 18px;
+            left: 50%;
+            top: 50%;
+            transform: translate(-50%, -50%);
+        }
+
+        .wifi-icon::after {
+            border-radius: 5px;
+            width: 10px;
+            height: 10px;
+            top: 65%;
+        }
+
+        /* Creating connectivity state using CSS */
+        .wifi-connected {
+            width: 40px;
+            height: 40px;
+            border-radius: 50%;
+            background: #3a3a5c;
+            position: relative;
+            margin-right: 10px;
+        }
+
+        .wifi-connected::before, .wifi-connected::after {
+            content: '';
+            position: absolute;
+            border-radius: 50%;
+            background: #fff;
+            left: 50%;
+            transform: translateX(-50%);
+        }
+
+        .wifi-connected::before {
+            width: 30px;
+            height: 30px;
+            top: 10px;
+        }
+
+        .wifi-connected::after {
+            width: 18px;
+            height: 18px;
+            top: 22px;
+        }
     </style>
     <script src="https://cdn.rawgit.com/davidshimjs/qrcodejs/gh-pages/qrcode.min.js"></script>
+</head>
+<body>
+    <div id="status">
+        <span id="connection-status">Not Connected</span>
+        <div id="wifi-icon" class="wifi-icon"></div>
+    </div>
+
+    <div id="container">
+        <h1>Peer Connection</h1>
+        <textarea id="offer" placeholder="Paste the offer from Peer 1 here"></textarea>
+        <button onclick="connect()">Generate Answer</button>
+        <textarea id="answer" placeholder="Copy this and send to Peer 1" readonly></textarea>
+        <div id="qr-code"></div>
+        <p>Scan this QR code to copy the answer.</p>
+    </div>
+
     <script>
         let peerConnection;
         let dataChannel;
+        const backgrounds = [
+            "images/bg1.jpg",
+            "images/bg2.jpg",
+            "images/bg3.jpg",
+            "images/bg4.jpg",
+            "images/bg5.jpg",
+        ];
+        let currentBackground = 0;
+
+        // Rotate background images every 2 minutes
+        setInterval(() => {
+            currentBackground = (currentBackground + 1) % backgrounds.length;
+            document.body.style.backgroundImage = `url('${backgrounds[currentBackground]}')`;
+        }, 120000);
 
         function connect() {
             const offer = document.getElementById("offer").value.trim();
-
-            // If offer is empty, show the error modal
             if (!offer) {
-                showErrorModal("The offer field cannot be empty.");
+                alert("Please paste the offer from Peer 1.");
                 return;
             }
 
@@ -154,84 +210,55 @@
             peerConnection.ondatachannel = (event) => {
                 dataChannel = event.channel;
                 dataChannel.onopen = () => {
-                    document.getElementById("status").innerText = "Connected!";
-                    document.getElementById("wifi-icon").src = 'https://upload.wikimedia.org/wikipedia/commons/0/0e/Wifi_icon.svg'; // External Wi-Fi icon
+                    console.log("Data channel is open!");
+                    updateConnectionStatus(true);
                 };
             };
 
             peerConnection.onicecandidate = (event) => {
                 if (!event.candidate) {
-                    document.getElementById("answer").value = JSON.stringify(peerConnection.localDescription);
+                    const answer = JSON.stringify(peerConnection.localDescription);
+                    document.getElementById("answer").value = answer;
+                    generateQRCode(answer);
                 }
             };
 
-            // Try to set the remote description and create the answer
-            peerConnection.setRemoteDescription(JSON.parse(offer))
+            peerConnection
+                .setRemoteDescription(JSON.parse(offer))
                 .then(() => peerConnection.createAnswer())
-                .then(answer => peerConnection.setLocalDescription(answer))
-                .then(() => {
-                    const answerText = document.getElementById("answer").value;
-                    showQRCode(answerText);
-                })
-                .catch((error) => {
-                    console.error("Error during connection:", error);
-                    showErrorModal("An error occurred while generating the answer. Please try again.");
-                });
+                .then((answer) => peerConnection.setLocalDescription(answer))
+                .catch((error) => console.error("Error during connection:", error));
         }
 
-        function showQRCode(answerText) {
-            // Display the QR code overlay
-            document.getElementById("qr-overlay").style.display = 'block';
+        function generateQRCode(answerText) {
+            const qrCodeContainer = document.getElementById("qr-code");
 
-            // Generate the QR code
-            const qrCode = new QRCode(document.getElementById("qr-code"), {
+            // Clear previous QR code
+            qrCodeContainer.innerHTML = '';
+
+            // Generate a new QR code
+            new QRCode(qrCodeContainer, {
                 text: answerText,
-                width: 200,
-                height: 200,
+                width: 256,
+                height: 256,
+                colorDark: "#000000",
+                colorLight: "#ffffff",
+                correctLevel: QRCode.CorrectLevel.H,
             });
-
-            // Optionally, add a message or instructions
-            document.getElementById("qr-overlay").innerHTML = `
-                <div id="qr-code"></div>
-                <p>Scan this QR code with your phone to copy the answer.</p>
-            `;
         }
 
-        function showErrorModal(message) {
-            const modal = document.getElementById("error-modal");
-            modal.querySelector("p").textContent = message;
-            modal.style.display = 'block';
+        function updateConnectionStatus(isConnected) {
+            const statusText = document.getElementById("connection-status");
+            const wifiIcon = document.getElementById("wifi-icon");
 
-            setTimeout(() => {
-                modal.style.display = 'none';
-                setTimeout(() => {
-                    window.location.href = "../index.html"; // Redirect to another HTML file
-                }, 2000);
-            }, 5000);
+            if (isConnected) {
+                statusText.textContent = "Connected";
+                wifiIcon.classList.add("wifi-connected");
+            } else {
+                statusText.textContent = "Not Connected";
+                wifiIcon.classList.remove("wifi-connected");
+            }
         }
     </script>
-</head>
-<body>
-    <!-- Connection status and Wi-Fi icon -->
-    <div id="header">
-        <img id="wifi-icon" src="https://upload.wikimedia.org/wikipedia/commons/d/d9/Wifi_icon_2.svg" class="wifi-icon" alt="Wi-Fi Icon"> <!-- External Wi-Fi icon -->
-        <p id="status">Not connected. Paste the offer to start.</p>
-    </div>
-
-    <!-- Settings at the center of the bottom, horizontally aligned with original options -->
-    <div id="offer-container">
-        <textarea id="offer" placeholder="Paste the offer from Peer 1 here"></textarea>
-        <button onclick="connect()">Generate Answer</button>
-        <textarea id="answer" placeholder="Copy this and send to Peer 1" readonly></textarea>
-    </div>
-
-    <!-- QR Code Overlay (initially hidden) -->
-    <div id="qr-overlay"></div>
-
-    <!-- Error Modal (initially hidden) -->
-    <div id="error-modal">
-        <p>Something went wrong. Restarting.</p>
-    </div>
-
 </body>
 </html>
