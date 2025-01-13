@@ -1,0 +1,164 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Chromecast Startup G Animation</title>
+    <style>
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+cursor: none;
+        }
+
+        body, html {
+            height: 100%;
+            display: flex;
+            justify-content: center;
+            align-items: center;
+            background-color: #000;
+            overflow: hidden;
+            transition: background-color 2s;
+cursor: none;
+        }
+
+        .g-container {
+            position: relative;
+            width: 120px;
+            height: 120px;
+            display: flex;
+            justify-content: center;
+            align-items: center;
+cursor: none;
+        }
+
+        .segment {
+            position: absolute;
+            width: 40px;
+            height: 40px;
+            border-radius: 50%;
+            opacity: 0;
+cursor: none;
+        }
+
+        .segment-1 { background-color: #FF4C00; }
+        .segment-2 { background-color: #FFB400; }
+        .segment-3 { background-color: #00A300; }
+        .segment-4 { background-color: #0061F0; }
+        .segment-5 { background-color: #F009F0; }
+
+        /* Smooth fade-in and movement animation */
+        @keyframes fade-in {
+            0% {
+                opacity: 0;
+                transform: translate(50px, 50px);
+cursor: none;
+            }
+            50% {
+                opacity: 1;
+                transform: translate(0, 0);
+cursor: none;
+            }
+            100% {
+                opacity: 1;
+                transform: translate(0, 0);
+cursor: none;
+            }
+        }
+
+        .segment-1 {
+            animation: fade-in 3s ease-in-out forwards 1;
+cursor: none;
+        }
+
+        .segment-2 {
+            animation: fade-in 3s 0.5s ease-in-out forwards 1;
+cursor: none;
+        }
+
+        .segment-3 {
+            animation: fade-in 3s 1s ease-in-out forwards 1;
+cursor: none;
+        }
+
+        .segment-4 {
+            animation: fade-in 3s 1.5s ease-in-out forwards 1;
+cursor: none;
+        }
+
+        .segment-5 {
+            animation: fade-in 3s 2s ease-in-out forwards 1, bounce 1s ease-in-out 2 forwards;
+cursor: none;
+        }
+
+        /* Repeat the animation */
+        .segment-1,
+        .segment-2,
+        .segment-3,
+        .segment-4,
+        .segment-5 {
+            animation-iteration-count: 2;
+cursor: none;
+        }
+
+        /* Bounce animation for the last segment */
+        @keyframes bounce {
+            0% {
+                transform: translate(50px, 50px);
+cursor: none;
+            }
+            25% {
+                transform: translate(0, -5px);
+cursor: none;
+            }
+            50% {
+                transform: translate(0, 5px);
+cursor: none;
+            }
+            75% {
+                transform: translate(0, -2px);
+cursor: none;
+            }
+            100% {
+                transform: translate(0, 0);
+cursor: none;
+            }
+        }
+
+        /* Black screen effect */
+        .black-screen {
+            background-color: #000;
+            opacity: 1;
+            transition: opacity 2s ease-out;
+cursor: none;
+        }
+
+    </style>
+</head>
+<body>
+    <div class="g-container">
+        <div class="segment segment-1"></div>
+        <div class="segment segment-2"></div>
+        <div class="segment segment-3"></div>
+        <div class="segment segment-4"></div>
+        <div class="segment segment-5"></div>
+    </div>
+
+    <script>
+        // Function to simulate the screen going black and redirecting after 2 seconds
+        function goToNextPage() {
+            // Set the background to black
+            document.body.classList.add('black-screen');
+            
+            // After 2 seconds (when the black screen is complete), redirect to a new HTML file
+            setTimeout(function() {
+                window.location.href = '../connect/connect.html'; // Replace 'newpage.html' with your desired URL
+            }, 2000);
+        }
+
+        // Call goToNextPage function after both animations are complete
+        setTimeout(goToNextPage, 5000); // Adjust timing based on animation duration
+    </script>
+</body>
+</html>

@@ -1,0 +1,65 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title></title>
+  <style>
+    body {
+      background-color: black;
+      color: white;
+      display: flex;
+      justify-content: center;
+      align-items: center;
+      height: 100vh;
+      margin: 0;
+      font-family: Arial, sans-serif;
+      position: relative;
+      cursor: none;
+    }
+    p {
+      font-size: 16px; /* Slightly larger text */
+      position: absolute;
+      bottom: 10px;
+      color: #ccc; /* Light grey color for contrast */
+      cursor: none;
+    }
+    #error-message1 {
+      position: absolute;
+      top: 10px;
+      left: 10px;
+      color: red;
+      font-size: 20px;
+      display: none; /* Initially hidden */
+cursor: none;
+    }
+    #error-message2 {
+      position: absolute;
+      top: 40px;
+      left: 10px;
+      color: red;
+      font-size: 20px;
+      display: none; /* Initially hidden */
+cursor: none;
+    }
+  </style>
+</head>
+<body>
+  <p>CastingOS...</p>
+  <div id="error-message1">System boot failed</div>
+  <div id="error-message2">Power off and on again to retry</div>
+
+  <script>
+    setTimeout(function() {
+      // Try to redirect to another HTML file after 5 seconds
+      try {
+        window.location.href = 'boot/boot.html'; // Replace 'newfile.html' with the target file name
+      } catch (e) {
+        // If redirect fails, show error messages
+        document.getElementById('error-message1').style.display = 'block';
+        document.getElementById('error-message2').style.display = 'block';
+      }
+    }, 5000);
+  </script>
+</body>
+</html>

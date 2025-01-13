@@ -1,0 +1,143 @@
+<!DOCTYPE html>
+<html>
+<head>
+    <title>Peer 2</title>
+    <style>
+        /* Reset default styles */
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+        }
+
+        body {
+            font-family: Arial, sans-serif;
+            height: 100vh;
+            display: flex;
+            flex-direction: column;
+            justify-content: flex-end;
+            background-image: url('images/bg.jpg'); /* Corrected path for local background image */
+            background-size: cover;
+            background-position: center;
+            color: #fff;
+        }
+
+        /* Header with connection status */
+        #header {
+            display: flex;
+            align-items: center;
+            justify-content: flex-start;
+            padding: 10px;
+            position: absolute;
+            top: 10px;
+            left: 10px;
+        }
+
+        #status {
+            margin-left: 10px;
+            font-size: 16px;
+        }
+
+        .wifi-icon {
+            width: 20px;
+            height: 20px;
+            margin-right: 5px;
+        }
+
+        /* Settings at the center of the bottom in a row */
+        #offer-container {
+            padding: 10px;
+            background-color: rgba(0, 0, 0, 0.8);
+            border-radius: 5px;
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            width: 90%;
+            max-width: 600px;
+            position: fixed;
+            bottom: 20px;
+            left: 50%;
+            transform: translateX(-50%);
+            z-index: 10;
+        }
+
+        /* Each block inside the settings container */
+        .settings-block {
+            margin: 0 5px;
+            padding: 10px;
+            background-color: #333;
+            color: #fff;
+            border-radius: 5px;
+            text-align: center;
+            width: 80px;
+            cursor: pointer;
+        }
+
+        textarea {
+            padding: 10px;
+            font-size: 14px;
+            border-radius: 5px;
+            margin-bottom: 10px;
+            width: 100%;
+            max-width: 100%;
+            background-color: #fff;
+            color: #333;
+            border: 1px solid #ddd;
+        }
+
+        button {
+            padding: 10px;
+            background-color: #007bff;
+            color: white;
+            border-radius: 5px;
+            border: none;
+            cursor: pointer;
+        }
+
+    </style>
+    <script>
+        let peerConnection;
+        let dataChannel;
+
+        function connect() {
+            peerConnection = new RTCPeerConnection();
+
+            peerConnection.ondatachannel = (event) => {
+                dataChannel = event.channel;
+                dataChannel.onopen = () => {
+                    document.getElementById("status").innerText = "Connected!";
+                    document.getElementById("wifi-icon").src = 'https://upload.wikimedia.org/wikipedia/commons/0/0e/Wifi_icon.svg'; // External Wi-Fi icon
+                };
+            };
+
+            peerConnection.onicecandidate = (event) => {
+                if (!event.candidate) {
+                    document.getElementById("answer").value = JSON.stringify(peerConnection.localDescription);
+                }
+            };
+
+            const offer = document.getElementById("offer").value.trim();
+            if (offer) {
+                peerConnection.setRemoteDescription(JSON.parse(offer))
+                    .then(() => peerConnection.createAnswer())
+                    .then(answer => peerConnection.setLocalDescription(answer));
+            }
+        }
+    </script>
+</head>
+<body>
+    <!-- Connection status and Wi-Fi icon -->
+    <div id="header">
+        <img id="wifi-icon" src="https://upload.wikimedia.org/wikipedia/commons/d/d9/Wifi_icon_2.svg" class="wifi-icon" alt="Wi-Fi Icon"> <!-- External Wi-Fi icon -->
+        <p id="status">Not connected. Paste the offer to start.</p>
+    </div>
+
+    <!-- Settings at the center of the bottom, horizontally aligned with original options -->
+    <div id="offer-container">
+        <textarea id="offer" placeholder="Paste the offer from Peer 1 here"></textarea>
+        <button onclick="connect()">Generate Answer</button>
+        <textarea id="answer" placeholder="Copy this and send to Peer 1" readonly></textarea>
+    </div>
+
+</body>
+</html>
