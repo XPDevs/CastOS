@@ -3,7 +3,7 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Image Background</title>
+    <title>CastOS Home UI</title>
     <style>
         body {
             margin: 0;
@@ -16,10 +16,31 @@
             background-position: center;
             background-repeat: no-repeat;
             transition: background-image 1s ease-in-out;
+            flex-direction: column;
+            text-align: center;
+        }
+        .clock, .date {
+            position: absolute;
+            bottom: 20px;
+            left: 50%;
+            transform: translateX(-50%);
+            font-family: Arial, sans-serif;
+            color: white;
+            text-shadow: 0 0 5px rgba(0, 0, 0, 0.7);
+        }
+        .clock {
+            font-size: 2rem;
+            margin-bottom: 15px; /* Space between the clock and date */
+        }
+        .date {
+            font-size: 1.5rem;
         }
     </style>
 </head>
 <body>
+    <div class="clock" id="clock"></div>
+    <div class="date" id="date"></div>
+
     <script>
         // Array of image URLs
         const images = [
@@ -68,6 +89,28 @@
 
         // Change the background image every 10 seconds
         setInterval(changeBackground, 10000);
+
+        // Function to update the clock and date (only hours and minutes for the clock)
+        function updateClockAndDate() {
+            const clockElement = document.getElementById('clock');
+            const dateElement = document.getElementById('date');
+            const now = new Date();
+            const hours = String(now.getHours()).padStart(2, '0');
+            const minutes = String(now.getMinutes()).padStart(2, '0');
+            const date = now.toLocaleDateString('en-US', {
+                weekday: 'long',
+                year: 'numeric',
+                month: 'long',
+                day: 'numeric'
+            });
+
+            clockElement.textContent = `${hours}:${minutes}`; // Only hours and minutes
+            dateElement.textContent = date;
+        }
+
+        // Update the clock and date every minute (since we removed seconds)
+        setInterval(updateClockAndDate, 60000);
+        updateClockAndDate(); // Initialize immediately
     </script>
 </body>
 </html>
