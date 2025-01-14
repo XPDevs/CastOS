@@ -1,164 +1,73 @@
 <!DOCTYPE html>
-<html>
+<html lang="en">
 <head>
-    <title>Peer 2 - Chromecast Style</title>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Image Background</title>
     <style>
-        /* Your existing styles */
-        * {
+        body {
             margin: 0;
             padding: 0;
-            box-sizing: border-box;
-        }
-
-        body {
-            font-family: 'Roboto', Arial, sans-serif;
-            background: url('images/bg1.jpg') no-repeat center center/cover;
-            color: #ffffff;
-            display: flex;
-            justify-content: center;
-            align-items: center;
             height: 100vh;
-            text-align: center;
-            position: relative;
-            overflow: hidden;
-        }
-
-        #container {
-            width: 90%;
-            max-width: 500px;
-            background: rgba(255, 255, 255, 0.1);
-            border-radius: 15px;
-            padding: 30px;
-            box-shadow: 0 10px 30px rgba(0, 0, 0, 0.5);
-        }
-
-        h1 {
-            font-size: 24px;
-            font-weight: 400;
-            margin-bottom: 20px;
-            text-transform: uppercase;
-        }
-
-        textarea {
-            width: 100%;
-            margin: 10px 0;
-            padding: 15px;
-            font-size: 14px;
-            border: none;
-            border-radius: 10px;
-            background: rgba(255, 255, 255, 0.2);
-            color: #ffffff;
-            outline: none;
-            resize: none;
-        }
-
-        button {
-            width: 100%;
-            padding: 15px;
-            margin: 20px 0;
-            background: #ffffff;
-            color: #3a3a5c;
-            border: none;
-            border-radius: 10px;
-            font-size: 16px;
-            font-weight: 600;
-            cursor: pointer;
-            transition: all 0.3s ease;
-        }
-
-        button:hover {
-            background: #f1f1f1;
-        }
-
-        #qr-code {
-            margin: 20px auto;
-            background: #ffffff;
-            border-radius: 10px;
-            padding: 10px;
             display: flex;
             justify-content: center;
             align-items: center;
-        }
-
-        #qr-code canvas {
-            width: 300px;
-            height: 300px;
-        }
-
-        p {
-            font-size: 14px;
-            color: #d1d1e0;
-            margin-top: 10px;
-        }
-
-        #status {
-            position: absolute;
-            top: 10px;
-            left: 10px;
-            padding: 10px;
-            background-color: rgba(0, 0, 0, 0.5);
-            color: #ffffff;
-            border-radius: 5px;
-            font-size: 14px;
-            font-weight: bold;
+            background-size: cover;
+            background-position: center;
+            background-repeat: no-repeat;
+            transition: background-image 1s ease-in-out;
         }
     </style>
-    <script src="https://cdn.rawgit.com/davidshimjs/qrcodejs/gh-pages/qrcode.min.js"></script>
 </head>
 <body>
-    <div id="status">Not Connected</div> <!-- Status div added here -->
-
-    <div id="container">
-        <h1>Peer Connection</h1>
-        <textarea id="offer" placeholder="Enter the offer from Peer 1"></textarea>
-        <button onclick="generateAnswer()">Generate Answer</button>
-        <textarea id="answer" placeholder="Copy this and send to Peer 1" readonly></textarea>
-        <div id="qr-code"></div>
-        <p>Scan this QR code to copy the answer.</p>
-    </div>
-
     <script>
-        function generateAnswer() {
-            const offer = document.getElementById('offer').value;
+        // Array of image URLs
+        const images = [
+            'https://lh6.googleusercontent.com/-A0tXm8gjfMU/U08VDMRGtuI/AAAAAAAAvrI/IQEscTGZyJY/s1920-w1920-h1080-c/IMG_0293%2Bhe.jpg',
+            'https://lh6.googleusercontent.com/-3LiF-MBl6OE/UO5TXZ724aI/AAAAAAAAE50/JWLqdeEM9QY/s1920-w1920-h1080-c/Colorado%2BRiver%2BSunset.jpg',
+            'https://lh4.googleusercontent.com/-wkrGBuk0DoA/Us9JnUoXnTI/AAAAAAAAkTA/yDQexzLKhKY/s1920-w1920-h1080-c/DSC_0660.JPG',
+            'https://lh3.googleusercontent.com/-1xZqgaRDIec/Tg1dMJq1vBI/AAAAAAAAALc/7m0Tpv2htVc/s1920-w1920-h1080-c/071227-4144-PtLomaReef.jpg'
+        ];
 
-            if (!offer) {
-                alert("Please enter the offer from Peer 1.");
-                return;
-            }
+        let currentIndex = 0;
 
-            // Here you can process the offer (e.g., extract necessary details like fingerprints, ICE candidates, etc.)
-            // For simplicity, we'll create a generic answer. In a real scenario, you'd need to parse the offer and generate the response accordingly.
-
-            const answer = {
-                type: 'answer',
-                sdp: offer // Just using the same offer as the answer for now
-            };
-
-            document.getElementById('answer').value = JSON.stringify(answer);
-            generateQRCode(answer.sdp);
-            updateConnectionStatus('connected'); // Update connection status when answer is generated
+        // Function to check if an image exists
+        function checkImage(url, callback) {
+            const img = new Image();
+            img.onload = () => callback(true);
+            img.onerror = () => callback(false);
+            img.src = url;
         }
 
-        function generateQRCode(data) {
-            const qrCodeElement = document.getElementById('qr-code');
-            qrCodeElement.innerHTML = '';
-            new QRCode(qrCodeElement, {
-                text: data,
-                width: 128,
-                height: 128,
+        // Function to change the background image
+        function changeBackground() {
+            currentIndex = (currentIndex + 1) % images.length;
+            const nextImage = images[currentIndex];
+
+            // Check if the image exists
+            checkImage(nextImage, exists => {
+                if (exists) {
+                    document.body.style.backgroundImage = `url('${nextImage}')`;
+                } else {
+                    console.warn(`Image not found: ${nextImage}`);
+                    // Skip to the next image
+                    changeBackground();
+                }
             });
         }
 
-        function updateConnectionStatus(status) {
-            const statusElement = document.getElementById('status');
-            if (status === 'connected') {
-                statusElement.textContent = 'Connected';
-                statusElement.style.backgroundColor = 'rgba(0, 255, 0, 0.7)'; // Green background for connected
+        // Set the initial background image
+        checkImage(images[0], exists => {
+            if (exists) {
+                document.body.style.backgroundImage = `url('${images[0]}')`;
             } else {
-                statusElement.textContent = 'Not Connected';
-                statusElement.style.backgroundColor = 'rgba(255, 0, 0, 0.7)'; // Red background for not connected
+                console.warn(`Image not found: ${images[0]}`);
+                changeBackground();
             }
-        }
+        });
+
+        // Change the background image every 10 seconds
+        setInterval(changeBackground, 10000);
     </script>
 </body>
 </html>
