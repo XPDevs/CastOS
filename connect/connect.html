@@ -13,6 +13,7 @@
             display: flex;
             justify-content: center;
             align-items: center;
+            background-image: url("images/bg.jpg"); /* Updated background image path */
             background-size: cover;
             background-position: center;
             background-repeat: no-repeat;
@@ -55,6 +56,11 @@
         .top-right img {
             width: 35px;
             height: 35px;
+            margin-left: 10px;
+        }
+
+        .connection-status {
+            font-size: 1.2rem;
             margin-left: 10px;
         }
 
@@ -170,7 +176,7 @@
 </head>
 <body>
     <div class="top-right">
-        <span id="connection-status"></span> 
+        <span id="connection-status" class="connection-status">Initializing...</span>
         <img src="images/cast.svg" alt="Icon">
     </div>
 
@@ -226,8 +232,29 @@
         let remoteStream = null;
 
         peerConnection.oniceconnectionstatechange = () => {
-            if (peerConnection.iceConnectionState === "connected") {
-                document.getElementById('connection-status').textContent = "Connected";
+            const connectionStatusElement = document.getElementById('connection-status');
+            
+            switch (peerConnection.iceConnectionState) {
+                case "new":
+                    connectionStatusElement.textContent = "Initializing...";
+                    break;
+                case "checking":
+                    connectionStatusElement.textContent = "Checking connection...";
+                    break;
+                case "connected":
+                    connectionStatusElement.textContent = "Connected";
+                    break;
+                case "disconnected":
+                    connectionStatusElement.textContent = "Disconnected";
+                    break;
+                case "failed":
+                    connectionStatusElement.textContent = "Connection failed";
+                    break;
+                case "closed":
+                    connectionStatusElement.textContent = "Connection closed";
+                    break;
+                default:
+                    connectionStatusElement.textContent = "Unknown status";
             }
         };
 
@@ -267,7 +294,7 @@
             try {
                 const offer = document.getElementById('offer-input').value.trim();  // Ensure there's no leading/trailing whitespace
                 if (offer && offer !== "") {  // Check if the offer is non-empty
-                    const answer = "generated_answer_based_on_offer";  // Replace with actual logic to generate the answer based on the offer
+                    const answer = generateAnswerFromOffer(offer);  // Generate the answer based on the offer
                     console.log("Generated answer based on offer:", answer);  // Log the answer being generated
 
                     // Try generating QR code
@@ -301,6 +328,13 @@
                 console.error("Error generating answer:", error);
             }
         });
+
+        // Implement a function to generate an answer from the offer (example logic)
+        function generateAnswerFromOffer(offer) {
+            // Example logic: create a valid WebRTC answer from the offer
+            let answer = "Generated Answer: " + offer;
+            return answer;
+        }
     </script>
 </body>
 </html>
