@@ -3,7 +3,7 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>CastOS Hom UI - Peer 2</title>
+    <title>CastOS Home UI - Peer 2</title>
     <style>
         /* (Include your CSS styles here) */
         body {
@@ -23,7 +23,21 @@
             position: relative;
             font-family: Arial, sans-serif;
             color: white;
+cursor: none; /* Hide cursor globally */
         }
+
+    /* Custom cursor style */
+    .cursor {
+      position: absolute;
+      width: 32px; /* Customize the size of the cursor */
+      height: 32px;
+      background-image: url('../ui/cursor/cursor.ico'); /* Custom cursor image (ICO file) */
+      background-size: contain;
+      pointer-events: none;
+      transform: translate(-50%, -50%);
+      z-index: 9999;
+cursor: none; /* Hide cursor globally */
+    }
 
         .clock, .date {
             position: absolute;
@@ -31,15 +45,18 @@
             left: 50%;
             transform: translateX(-50%);
             text-shadow: 0 0 5px rgba(0, 0, 0, 0.7);
+cursor: none; /* Hide cursor globally */
         }
 
         .clock {
             font-size: 2rem;
             margin-bottom: 20px;
+cursor: none; /* Hide cursor globally */
         }
 
         .date {
             font-size: 1.2rem;
+cursor: none; /* Hide cursor globally */
         }
 
         .top-right {
@@ -51,17 +68,20 @@
             color: white;
             text-shadow: 0 0 5px rgba(0, 0, 0, 0.7);
             flex-direction: row;
+cursor: none; /* Hide cursor globally */
         }
 
         .top-right img {
             width: 35px;
             height: 35px;
             margin-left: 10px;
+cursor: none; /* Hide cursor globally */
         }
 
         .connection-status {
             font-size: 1.2rem;
             margin-left: 10px;
+cursor: none; /* Hide cursor globally */
         }
 
         .webrtc-container {
@@ -71,18 +91,20 @@
             transform: translateX(-50%);
             width: 100%;
             max-width: 400px;
+cursor: none; /* Hide cursor globally */
         }
 
         #qr-code {
             margin-bottom: 20px;
             display: flex;
             justify-content: center;
+cursor: none; /* Hide cursor globally */
         }
 
         .buttons button {
             padding: 10px 20px;
             font-size: 1rem;
-            cursor: pointer;
+            cursor: none; /* Hide cursor globally */
             border: none;
             background: rgba(255, 255, 255, 0.2);
             border-radius: 5px;
@@ -93,6 +115,7 @@
 
         .buttons button:hover {
             background: rgba(255, 255, 255, 0.4);
+cursor: none; /* Hide cursor globally */
         }
 
         #offer-input {
@@ -104,6 +127,7 @@
             background: rgba(0, 0, 0, 0.6);
             color: white;
             border-radius: 5px;
+cursor: none; /* Hide cursor globally */
         }
 
         .modal {
@@ -117,6 +141,7 @@
             overflow: auto;
             background-color: rgba(0, 0, 0, 0.5);
             padding-top: 60px;
+cursor: none; /* Hide cursor globally */
         }
 
         .modal-content {
@@ -126,23 +151,27 @@
             border-radius: 5px;
             width: 80%;
             max-width: 400px;
+cursor: none; /* Hide cursor globally */
         }
 
         .modal-header {
             font-size: 1.2rem;
             font-weight: bold;
             color: white;
+cursor: none; /* Hide cursor globally */
         }
 
         .modal-body {
             margin-top: 10px;
             font-size: 1rem;
             color: white;
+cursor: none; /* Hide cursor globally */
         }
 
         .modal-footer {
             text-align: right;
             margin-top: 20px;
+cursor: none; /* Hide cursor globally */
         }
 
         .modal-footer button {
@@ -152,10 +181,12 @@
             border-radius: 5px;
             color: white;
             transition: background 0.3s ease;
+cursor: none; /* Hide cursor globally */
         }
 
         .modal-footer button:hover {
             background: rgba(255, 255, 255, 0.4);
+cursor: none; /* Hide cursor globally */
         }
 
         .close {
@@ -164,13 +195,14 @@
             font-weight: bold;
             float: right;
             cursor: pointer;
+cursor: none; /* Hide cursor globally */
         }
 
         .close:hover,
         .close:focus {
             color: #aaa;
             text-decoration: none;
-            cursor: pointer;
+cursor: none; /* Hide cursor globally */
         }
 
         /* New styles for the restart popup */
@@ -182,8 +214,8 @@
             color: white;
             padding: 10px;
             border-radius: 5px;
-            cursor: pointer;
             display: none;
+cursor: none; /* Hide cursor globally */
         }
 
         #restart-popup button {
@@ -192,15 +224,17 @@
             border: none;
             padding: 8px;
             border-radius: 5px;
-            cursor: pointer;
+cursor: none; /* Hide cursor globally */
         }
 
         #restart-popup button:hover {
             background-color: rgba(255, 255, 255, 0.4);
+cursor: none; /* Hide cursor globally */
         }
     </style>
 </head>
 <body>
+ <div class="cursor" id="cursor"></div>
     <div class="top-right">
         <span id="connection-status" class="connection-status"></span>
         <img src="images/cast.svg" alt="Icon">
@@ -374,6 +408,14 @@
             let answer = "Generated Answer: " + offer;
             return answer;
         }
+
+    const cursor = document.getElementById('cursor');
+
+    // Track mouse movement and set the custom cursor position
+    document.addEventListener('mousemove', (e) => {
+      cursor.style.left = `${e.pageX}px`;
+      cursor.style.top = `${e.pageY}px`;
+    });
     </script>
 </body>
 </html>
