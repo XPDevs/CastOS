@@ -3,7 +3,7 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>CastOS Hom UI</title>
+    <title>CastOS Hom UI - Peer 2</title>
     <style>
         body {
             margin: 0;
@@ -19,25 +19,27 @@
             flex-direction: column;
             text-align: center;
             position: relative;
+            font-family: Arial, sans-serif;
+            color: white;
         }
+
         .clock, .date {
             position: absolute;
             bottom: 20px;
             left: 50%;
             transform: translateX(-50%);
-            font-family: Arial, sans-serif;
-            color: white;
             text-shadow: 0 0 5px rgba(0, 0, 0, 0.7);
         }
+
         .clock {
             font-size: 2rem;
-            margin-bottom: 25px; /* Space between the clock and date */
-        }
-        .date {
-            font-size: 1.5rem;
+            margin-bottom: 20px;
         }
 
-        /* Icon and Text Styling (Top Right) */
+        .date {
+            font-size: 1.2rem;
+        }
+
         .top-right {
             position: absolute;
             top: 10px;
@@ -45,78 +47,243 @@
             display: flex;
             align-items: center;
             color: white;
-            font-family: Arial, sans-serif;
             text-shadow: 0 0 5px rgba(0, 0, 0, 0.7);
+            flex-direction: row;
         }
 
         .top-right img {
-            width: 40px;
-            height: 40px;
-            margin-right: 10px;
+            width: 35px;
+            height: 35px;
+            margin-left: 10px;
+        }
+
+        .webrtc-container {
+            position: absolute;
+            bottom: 80px;
+            left: 50%;
+            transform: translateX(-50%);
+            width: 100%;
+            max-width: 400px;
+        }
+
+        #qr-code {
+            margin-bottom: 20px;
+            display: flex;
+            justify-content: center;
+        }
+
+        .buttons button {
+            padding: 10px 20px;
+            font-size: 1rem;
+            cursor: pointer;
+            border: none;
+            background: rgba(255, 255, 255, 0.2);
+            border-radius: 5px;
+            margin: 10px;
+            color: white;
+            transition: background 0.3s ease;
+        }
+
+        .buttons button:hover {
+            background: rgba(255, 255, 255, 0.4);
+        }
+
+        #offer-input {
+            width: 100%;
+            padding: 10px;
+            font-size: 1rem;
+            margin-top: 20px;
+            border: 1px solid rgba(255, 255, 255, 0.3);
+            background: rgba(0, 0, 0, 0.6);
+            color: white;
+            border-radius: 5px;
+        }
+
+        .modal {
+            display: none;
+            position: fixed;
+            z-index: 1;
+            left: 0;
+            top: 0;
+            width: 100%;
+            height: 100%;
+            overflow: auto;
+            background-color: rgba(0, 0, 0, 0.5);
+            padding-top: 60px;
+        }
+
+        .modal-content {
+            background-color: #2c2c2c;
+            margin: 5% auto;
+            padding: 20px;
+            border-radius: 5px;
+            width: 80%;
+            max-width: 400px;
+        }
+
+        .modal-header {
+            font-size: 1.2rem;
+            font-weight: bold;
+            color: white;
+        }
+
+        .modal-body {
+            margin-top: 10px;
+            font-size: 1rem;
+            color: white;
+        }
+
+        .modal-footer {
+            text-align: right;
+            margin-top: 20px;
+        }
+
+        .modal-footer button {
+            padding: 10px 15px;
+            cursor: pointer;
+            background: rgba(255, 255, 255, 0.2);
+            border-radius: 5px;
+            color: white;
+            transition: background 0.3s ease;
+        }
+
+        .modal-footer button:hover {
+            background: rgba(255, 255, 255, 0.4);
+        }
+
+        .close {
+            color: white;
+            font-size: 28px;
+            font-weight: bold;
+            float: right;
+            cursor: pointer;
+        }
+
+        .close:hover,
+        .close:focus {
+            color: #aaa;
+            text-decoration: none;
+            cursor: pointer;
         }
     </style>
 </head>
 <body>
-    <!-- Top Right Icon and Text -->
     <div class="top-right">
-        <!-- Example local SVG icon (replace with your own file path) -->
+        <span id="connection-status"></span> 
         <img src="images/cast.svg" alt="Icon">
-        <span>My Icon</span>
     </div>
 
     <div class="clock" id="clock"></div>
     <div class="date" id="date"></div>
 
+    <div class="webrtc-container">
+        <div id="qr-code"></div>
+        <div class="buttons">
+            <button id="generate-answer">Generate Answer</button>
+        </div>
+
+        <textarea id="offer-input" placeholder="Paste the offer from Peer 1 here"></textarea>
+    </div>
+
+    <div id="modal" class="modal">
+        <div class="modal-content">
+            <div class="modal-header">
+                <span class="close">&times;</span>
+                <h2>Message</h2>
+            </div>
+            <div class="modal-body" id="modal-body">
+                <!-- Dynamic message will be inserted here -->
+            </div>
+            <div class="modal-footer">
+                <button id="modal-close-button">Close</button>
+            </div>
+        </div>
+    </div>
+
+    <script src="https://cdn.jsdelivr.net/npm/qrcode/build/qrcode.min.js"></script>
     <script>
-        // Array of image URLs
+        const modal = document.getElementById("modal");
+        const closeModal = document.getElementsByClassName("close")[0];
+        const modalBody = document.getElementById("modal-body");
+        const closeButton = document.getElementById("modal-close-button");
+
+        function showModal(message) {
+            modalBody.textContent = message;
+            modal.style.display = "block";
+        }
+
+        closeModal.onclick = function() {
+            modal.style.display = "none";
+        }
+
+        closeButton.onclick = function() {
+            modal.style.display = "none";
+        }
+
+        const peerConnection = new RTCPeerConnection();
+        let localStream = null;
+        let remoteStream = null;
+
+        peerConnection.oniceconnectionstatechange = () => {
+            if (peerConnection.iceConnectionState === "connected") {
+                document.getElementById('connection-status').textContent = "Connected";
+            }
+        };
+
         const images = [
-            'https://lh6.googleusercontent.com/-A0tXm8gjfMU/U08VDMRGtuI/AAAAAAAAvrI/IQEscTGZyJY/s1920-w1920-h1080-c/IMG_0293%2Bhe.jpg',
-            'https://lh3.googleusercontent.com/-36YdSRh6q9w/TgtZEChvrkI/AAAAAAAJA0M/zVvIUAdwQ3Q/s1920-w1920-h1080-c/976865336_a%2Bview%2Bof%2Bqueenstown.jpg',
-            'https://lh4.googleusercontent.com/-wkrGBuk0DoA/Us9JnUoXnTI/AAAAAAAAkTA/yDQexzLKhKY/s1920-w1920-h1080-c/DSC_0660.JPG',
-            'https://lh3.googleusercontent.com/-1xZqgaRDIec/Tg1dMJq1vBI/AAAAAAAAALc/7m0Tpv2htVc/s1920-w1920-h1080-c/071227-4144-PtLomaReef.jpg'
-        ];
+    'https://lh6.googleusercontent.com/-A0tXm8gjfMU/U08VDMRGtuI/AAAAAAAAvrI/IQEscTGZyJY/s1920-w1920-h1080-c/IMG_0293%2Bhe.jpg',
+    'https://lh3.googleusercontent.com/-36YdSRh6q9w/TgtZEChvrkI/AAAAAAAJA0M/zVvIUAdwQ3Q/s1920-w1920-h1080-c/976865336_a%2Bview%2Bof%2Bqueenstown.jpg',
+    'https://lh4.googleusercontent.com/-wkrGBuk0DoA/Us9JnUoXnTI/AAAAAAAAkTA/yDQexzLKhKY/s1920-w1920-h1080-c/DSC_0660.JPG',
+    'https://lh3.googleusercontent.com/-1xZqgaRDIec/Tg1dMJq1vBI/AAAAAAAAALc/7m0Tpv2htVc/s1920-w1920-h1080-c/071227-4144-PtLomaReef.jpg',
+    'https://lh3.googleusercontent.com/-36YdSRh6q9w/TgtZEChvrkI/AAAAAAAJA0M/zVvIUAdwQ3Q/s1920-w1920-h1080-c/976865336_a%2Bview%2Bof%2Bqueenstown.jpg',
+    'https://lh5.googleusercontent.com/-ciHScPkPIjY/USd_CK03c5I/AAAAAAAAm9o/6CWLX5P59aI/s1920-w1920-h1080-c/RayofHope.jpg',
+    'https://lh5.googleusercontent.com/--L7AhWZit78/TysVss3ThoI/AAAAAAAARho/n2ToQ-2Kw7g/s1920-w1920-h1080-c/GGB-MarshallBeach-lightSky.jpg',
+    'https://lh3.googleusercontent.com/-dXBA-gHPDPU/UPSOYTL_lpI/AAAAAAAALn4/jH17jwSZeYk/s1920-w1920-h1080-c/Dare%2Bto%2BDream.jpg',
+    'https://lh4.googleusercontent.com/-JvGl0iUdb58/UfvkbbsvXtI/AAAAAAAAaJc/1aANEbTHeK4/s1920-w1920-h1080-c/DSC_1644-Edit-Edit-Edit-Edit.JPG',
+    'https://lh4.googleusercontent.com/-ePzy0PYNkjY/ToE9F9iPxKI/AAAAAAAAsWg/o7LkkqWEs2o/s1920-w1920-h1080-c/DSC01079%2B%25281%2529.JPG',
+    'https://lh5.googleusercontent.com/-5inyrU95-M4/UTrLw33X2FI/AAAAAAAAdvw/A48rORvWG_g/s1920-w1920-h1080-c/20130307-%252812_35_23%2529-tahoe-iq180-16274.jpg',
+    'https://lh4.googleusercontent.com/-pnosgcd6G2c/UbheNBeniVI/AAAAAAAAWp0/hSEX3IwAgyI/s1920-w1920-h1080-c/DSC_8492_HDR-Edit.JPG',
+    'https://lh6.googleusercontent.com/-El8tXEJMqm4/UOD9tk8_rkI/AAAAAAAAkM0/sZP34rwkVsQ/s1920-w1920-h1080-c/02202012-04.jpg',
+    'https://lh4.googleusercontent.com/-EpsKJMBxb6I/TBpXudG4_PI/AAAAAAABEHk/_knVZZOptTY/s1920-w1920-h1080-c/20100530_120257_0273-Edit-2.jpg',
+    'https://lh4.googleusercontent.com/-Ot1wFdQdaqw/UBSl7ewGOkI/AAAAAAAAPd4/3tUkrKTWDgM/s1920-w1920-h1080-c/Lines.jpg',
+    'https://lh4.googleusercontent.com/-WbNq4f1kE7Y/Tu9tVtXGCYI/AAAAAAABFWY/N9NL1MKUt4A/s1920-w1920-h1080-c/DunesEdge.jpg',
+    'https://lh5.googleusercontent.com/-YPiBdTDD5Vo/UpExbztAgWI/AAAAAAAAFg8/8n5CyP4w8Ps/s1920-w1920-h1080-c/DSC_2857.jpg',
+    'https://lh5.googleusercontent.com/-CY6T5q8rqmA/UZWyvmYhLYI/AAAAAAAAAw4/Pi0Uy3nq19I/s1920-w1920-h1080-c/DSC_0513-edited.jpeg',
+    'https://lh6.googleusercontent.com/-fc8aRqsAEzk/U0MjlhykUtI/AAAAAAAJF1s/nRoV1Yk1z2E/s1920-w1920-h1080-c/stuck_04.jpg',
+    'https://lh5.googleusercontent.com/-ExqBtlpobeE/T-aKZZzVcKI/AAAAAAABhl4/jrErtktlcuA/s1920-w1920-h1080-c/Dandelion_.jpg',
+    'https://lh3.googleusercontent.com/-3nqLFWiEm3E/UXXCrC5RBeI/AAAAAAAANoY/8_ktEhLdCLs/s1920-w1920-h1080-c/8670434759_91e92fd1ee_k.jpg',
+    'https://lh4.googleusercontent.com/-gJmej39yU_c/TgtZECWgTtI/AAAAAAAJFFY/Y0nVr5_Tchg/s1920-w1920-h1080-c/2049233526_19f97ff57f_o.jpg',
+    'https://lh5.googleusercontent.com/-teMxOetSsy0/TwNDboHbM0I/AAAAAAABFao/F9yQHylkRdo/s1920-w1920-h1080-c/RodeoBeach-firespinning-2.jpg',
+    'https://lh5.googleusercontent.com/-G_wJmFcGDaM/UeAGqoSizxI/AAAAAAAAYwo/OrQTf8ec-3o/s1920-w1920-h1080-c/calm%2Bbefore.jpg',
+    'https://lh5.googleusercontent.com/-rF8zodn1xAI/U_yjoZyDgcI/AAAAAAAB-38/U62D7hi4-NU/s1920-w1920-h1080-c/20140204_Iceland_0234_5_6_32bit.jpg',
+    'https://lh5.googleusercontent.com/-GmQO1Vlmg7s/UJy4LyPVnvI/AAAAAAAANRU/ZuYXmzQhebE/s1920-w1920-h1080-c/img_0001_03.jpg',
+    'https://lh6.googleusercontent.com/-KiRwrTTHEWk/UdFoWqh2bFI/AAAAAAAAXhA/6PIDVYH9nFY/s1920-w1920-h1080-c/DSC_6887-Edit-Edit.JPG',
+    'https://lh5.googleusercontent.com/-6_QxmRRnJO8/TwjqsB2kshI/AAAAAAABFZw/__-irT00R2k/s1920-w1920-h1080-c/SealRocks-sunset-beach-rock.jpg',
+    'https://lh5.googleusercontent.com/-A7Ahpb0-m1I/TmBVlD7kYrI/AAAAAAAACUs/mPbCyWf9LXA/s1920-w1920-h1080-c/IMG_6904.jpg',
+    'https://lh6.googleusercontent.com/-HWAadtEQKQE/UtTyRxs2u4I/AAAAAAAAOhk/Y3jT0QJtdhQ/s1920-w1920-h1080-c/DSC_7112.jpg',
+    'https://lh5.googleusercontent.com/-BNreXonTg-k/ThCQ_bm_4nI/AAAAAAAAAZ0/WJcnGWiY5yI/s1920-w1920-h1080-c/090407-0587-ForkInTheRoad.jpg',
+    'https://lh6.googleusercontent.com/-5NKrifl_xpo/UUxwAqoj7nI/AAAAAAAAwGk/82Dkiz_sEaw/s1920-w1920-h1080-c/Invitation.jpg',
+    'https://lh3.googleusercontent.com/-br0TcMf3OVc/UlMfoCpTKpI/AAAAAAAAGHU/Qo2d54KlDrc/s1920-w1920-h1080-c/GMZzGwX.jpg',
+    'https://lh3.googleusercontent.com/-W5qc4LH_lpo/U_yjzHjSpzI/AAAAAAAB-7E/8MQAw4fsEJc/s1920-w1920-h1080-c/_DX_7114-Edit-Recovered.jpg',
+    'https://lh5.googleusercontent.com/-F_p_m0vyQqg/UO5Tq_9TirI/AAAAAAAAE-4/Zkw4bRQjGdU/s1920-w1920-h1080-c/Rice%2BFields.jpg',
+    'https://lh4.googleusercontent.com/-sy3wa9ofb38/UQtPlF6YOQI/AAAAAAAAfXc/9uYpeM68vOc/s1920-w1920-h1080-c/IMGP8993.jpg',
+    'https://lh5.googleusercontent.com/-cFySK9YoOOI/SwTDSXWTa2I/AAAAAAABNnY/1VFL3dYXkgA/s1920-w1920-h1080-c/dsc_4194.jpg',
+    'https://lh5.googleusercontent.com/-WDd72zqvAY4/URlS5WAGihI/AAAAAAAAXLs/MJ9Z1UId3gA/s1920-w1920-h1080-c/by%2BRuss%2BBishop.jpg',
+    'https://lh4.googleusercontent.com/-V8ifxhq3-Yw/T43ivW-pQgI/AAAAAAAAQrM/OeAQZzV5LcE/s1920-w1920-h1080-c/071229-4231-SandstNSky1.jpg'
+];
+
 
         let currentIndex = 0;
 
-        // Function to check if an image exists
-        function checkImage(url, callback) {
-            const img = new Image();
-            img.onload = () => callback(true);
-            img.onerror = () => callback(false);
-            img.src = url;
-        }
-
-        // Function to change the background image
         function changeBackground() {
             currentIndex = (currentIndex + 1) % images.length;
             const nextImage = images[currentIndex];
-
-            // Check if the image exists
-            checkImage(nextImage, exists => {
-                if (exists) {
-                    document.body.style.backgroundImage = `url('${nextImage}')`;
-                } else {
-                    console.warn(`Image not found: ${nextImage}`);
-                    // Skip to the next image
-                    changeBackground();
-                }
-            });
+            document.body.style.backgroundImage = `url('${nextImage}')`;
         }
 
-        // Set the initial background image
-        checkImage(images[0], exists => {
-            if (exists) {
-                document.body.style.backgroundImage = `url('${images[0]}')`;
-            } else {
-                console.warn(`Image not found: ${images[0]}`);
-                changeBackground();
-            }
-        });
-
-        // Change the background image every 10 seconds
         setInterval(changeBackground, 10000);
+        changeBackground();
 
-        // Function to update the clock and date (only hours and minutes for the clock)
         function updateClockAndDate() {
             const clockElement = document.getElementById('clock');
             const dateElement = document.getElementById('date');
@@ -130,13 +297,38 @@
                 day: 'numeric'
             });
 
-            clockElement.textContent = `${hours}:${minutes}`; // Only hours and minutes
+            clockElement.textContent = `${hours}:${minutes}`;
             dateElement.textContent = date;
         }
 
-        // Update the clock and date every minute (since we removed seconds)
         setInterval(updateClockAndDate, 60000);
-        updateClockAndDate(); // Initialize immediately
+        updateClockAndDate();
+
+        document.getElementById('generate-answer').addEventListener('click', function() {
+            try {
+                const offer = document.getElementById('offer-input').value.trim();  // Ensure there's no leading/trailing whitespace
+                if (offer && offer !== "") {  // Check if the offer is non-empty
+                    const answer = "generated_answer_based_on_offer";  // Replace with actual logic to generate the answer based on the offer
+                    console.log("Generated answer based on offer:", answer);  // Log the answer being generated
+
+                    // Try generating QR code
+                    QRCode.toCanvas(document.getElementById('qr-code'), answer, function(error) {
+                        if (error) {
+                            showModal("Error generating QR code: " + error.message);
+                            console.error("Error generating QR code:", error);
+                        } else {
+                            console.log("QR code generated successfully");
+                        }
+                    });
+                } else {
+                    showModal("Please provide a valid offer from Peer 1.");
+                    console.log("Offer input is empty or invalid");
+                }
+            } catch (error) {
+                showModal("Error generating answer: " + error.message);
+                console.error("Error generating answer:", error);
+            }
+        });
     </script>
 </body>
 </html>
