@@ -3,162 +3,71 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Chromecast Startup G Animation</title>
+    <title>Spinner</title>
     <style>
-        * {
+        /* Fullscreen background */
+        body {
             margin: 0;
-            padding: 0;
-            box-sizing: border-box;
-cursor: none;
-        }
-
-        body, html {
-            height: 100%;
+            height: 100vh;
+            background-color: black;
             display: flex;
             justify-content: center;
             align-items: center;
-            background-color: #000;
-            overflow: hidden;
-            transition: background-color 2s;
-cursor: none;
         }
 
-        .g-container {
+        .spinner {
             position: relative;
-            width: 120px;
-            height: 120px;
-            display: flex;
-            justify-content: center;
-            align-items: center;
-cursor: none;
+            width: 50px;
+            height: 50px;
         }
-
-        .segment {
+        .spinner div {
             position: absolute;
-            width: 40px;
-            height: 40px;
+            width: 8px;
+            height: 8px;
+            background-color: #fff;
             border-radius: 50%;
-            opacity: 0;
-cursor: none;
+            animation: spinner 1.2s cubic-bezier(0.5, 0, 0.5, 1) infinite;
         }
+        .spinner div:nth-child(1) { top: 0; left: 50%; transform: translate(-50%, -50%); animation-delay: -1.1s; }
+        .spinner div:nth-child(2) { top: 14%; left: 86%; transform: translate(-50%, -50%); animation-delay: -1s; }
+        .spinner div:nth-child(3) { top: 50%; left: 100%; transform: translate(-50%, -50%); animation-delay: -0.9s; }
+        .spinner div:nth-child(4) { top: 86%; left: 86%; transform: translate(-50%, -50%); animation-delay: -0.8s; }
+        .spinner div:nth-child(5) { top: 100%; left: 50%; transform: translate(-50%, -50%); animation-delay: -0.7s; }
+        .spinner div:nth-child(6) { top: 86%; left: 14%; transform: translate(-50%, -50%); animation-delay: -0.6s; }
+        .spinner div:nth-child(7) { top: 50%; left: 0; transform: translate(-50%, -50%); animation-delay: -0.5s; }
+        .spinner div:nth-child(8) { top: 14%; left: 14%; transform: translate(-50%, -50%); animation-delay: -0.4s; }
 
-        .segment-1 { background-color: #FF4C00; }
-        .segment-2 { background-color: #FFB400; }
-        .segment-3 { background-color: #00A300; }
-        .segment-4 { background-color: #0061F0; }
-        .segment-5 { background-color: #F009F0; }
-
-        /* Smooth fade-in and movement animation */
-        @keyframes fade-in {
-            0% {
-                opacity: 0;
-                transform: translate(50px, 50px);
-cursor: none;
-            }
-            50% {
-                opacity: 1;
-                transform: translate(0, 0);
-cursor: none;
-            }
-            100% {
-                opacity: 1;
-                transform: translate(0, 0);
-cursor: none;
-            }
+        @keyframes spinner {
+            0% { transform: scale(1); opacity: 1; }
+            100% { transform: scale(0); opacity: 0; }
         }
-
-        .segment-1 {
-            animation: fade-in 3s ease-in-out forwards 1;
-cursor: none;
-        }
-
-        .segment-2 {
-            animation: fade-in 3s 0.5s ease-in-out forwards 1;
-cursor: none;
-        }
-
-        .segment-3 {
-            animation: fade-in 3s 1s ease-in-out forwards 1;
-cursor: none;
-        }
-
-        .segment-4 {
-            animation: fade-in 3s 1.5s ease-in-out forwards 1;
-cursor: none;
-        }
-
-        .segment-5 {
-            animation: fade-in 3s 2s ease-in-out forwards 1, bounce 1s ease-in-out 2 forwards;
-cursor: none;
-        }
-
-        /* Repeat the animation */
-        .segment-1,
-        .segment-2,
-        .segment-3,
-        .segment-4,
-        .segment-5 {
-            animation-iteration-count: 2;
-cursor: none;
-        }
-
-        /* Bounce animation for the last segment */
-        @keyframes bounce {
-            0% {
-                transform: translate(50px, 50px);
-cursor: none;
-            }
-            25% {
-                transform: translate(0, -5px);
-cursor: none;
-            }
-            50% {
-                transform: translate(0, 5px);
-cursor: none;
-            }
-            75% {
-                transform: translate(0, -2px);
-cursor: none;
-            }
-            100% {
-                transform: translate(0, 0);
-cursor: none;
-            }
-        }
-
-        /* Black screen effect */
-        .black-screen {
-            background-color: #000;
-            opacity: 1;
-            transition: opacity 2s ease-out;
-cursor: none;
-        }
-
     </style>
 </head>
 <body>
-    <div class="g-container">
-        <div class="segment segment-1"></div>
-        <div class="segment segment-2"></div>
-        <div class="segment segment-3"></div>
-        <div class="segment segment-4"></div>
-        <div class="segment segment-5"></div>
+    <div class="spinner">
+        <div></div>
+        <div></div>
+        <div></div>
+        <div></div>
+        <div></div>
+        <div></div>
+        <div></div>
+        <div></div>
     </div>
 
     <script>
-        // Function to simulate the screen going black and redirecting after 2 seconds
-        function goToNextPage() {
-            // Set the background to black
-            document.body.classList.add('black-screen');
-            
-            // After 2 seconds (when the black screen is complete), redirect to a new HTML file
-            setTimeout(function() {
-                window.location.href = 'boot2.html'; // Replace 'newpage.html' with your desired URL
-            }, 2000);
-        }
+        // Redirect after 5 seconds
+        setTimeout(function() {
+            // Generate a random number between 10 and 20
+            const randomNum = Math.floor(Math.random() * 11) + 10;  // Generates a number between 10 and 20
 
-        // Call goToNextPage function after both animations are complete
-        setTimeout(goToNextPage, 5000); // Adjust timing based on animation duration
+            // If the random number is 10, go to boot2.html, else go to error.html
+            if (randomNum === 10) {
+                window.location.href = 'boot2.html';
+            } else {
+                window.location.href = '../index.html';
+            }
+        }, 5000); // 5 seconds delay
     </script>
 </body>
 </html>
