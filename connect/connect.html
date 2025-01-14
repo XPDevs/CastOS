@@ -5,6 +5,7 @@
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>CastOS Hom UI - Peer 2</title>
     <style>
+        /* (Include your CSS styles here) */
         body {
             margin: 0;
             padding: 0;
@@ -230,11 +231,7 @@
             }
         };
 
-        const images = [
-    'images/bg.jpg'
-];
-
-
+        const images = ['images/bg.jpg'];
         let currentIndex = 0;
 
         function changeBackground() {
@@ -274,12 +271,25 @@
                     console.log("Generated answer based on offer:", answer);  // Log the answer being generated
 
                     // Try generating QR code
-                    QRCode.toCanvas(document.getElementById('qr-code'), answer, function(error) {
+                    QRCode.toDataURL(answer, function(error, url) {
                         if (error) {
                             showModal("Error generating QR code: " + error.message);
                             console.error("Error generating QR code:", error);
                         } else {
+                            // Create an image element to display the QR code
+                            const img = document.createElement('img');
+                            img.src = url;
+                            img.alt = "Generated QR Code";
+                            
+                            // Append the generated QR code to the 'qr-code' container
+                            const qrContainer = document.getElementById('qr-code');
+                            qrContainer.innerHTML = '';  // Clear previous content (if any)
+                            qrContainer.appendChild(img);
+
                             console.log("QR code generated successfully");
+
+                            // Close the QR code modal
+                            modal.style.display = "none";
                         }
                     });
                 } else {
