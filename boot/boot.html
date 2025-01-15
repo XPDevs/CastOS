@@ -93,43 +93,26 @@
   <script>
     const images = document.querySelectorAll('#imageContainer img');
     let currentIndex = 0;
-    let loopCount = 0;
-    const maxLoops = 10;
 
     // Initially hide all images
     images.forEach(image => {
       image.style.display = 'none';
-      console.log(`Hiding image: ${image.src}`);
     });
     images[currentIndex].style.display = 'block';
-    console.log(`Displaying image: ${images[currentIndex].src}`);
 
     function showNextImage() {
-      console.log(`Loop ${loopCount + 1}, Showing image index: ${currentIndex}`);
-
       images[currentIndex].style.display = 'none';
-      console.log(`Hiding image: ${images[currentIndex].src}`);
-
       currentIndex = (currentIndex + 1) % images.length;
       images[currentIndex].style.display = 'block';
-      console.log(`Displaying image: ${images[currentIndex].src}`);
-
-      // Check if all images have been shown once
-      if (currentIndex === 0) {
-        loopCount++;
-        console.log(`Completed loop ${loopCount}`);
-      }
-
-      // If the loop has run 5 times, redirect to the next HTML file
-      if (loopCount >= maxLoops) {
-        console.log('Redirecting to the next page...');
-        window.location.href = "../connect/connect.html"; // Change this to your target HTML file
-      }
     }
 
     // Show each image for 30 milliseconds and move to the next
-    console.log('Starting the slideshow...');
     setInterval(showNextImage, 30); // 30 millisecond interval
+
+    // Redirect after 5.89 seconds
+    setTimeout(() => {
+      window.location.href = "../connect/connect.html"; // Change this to your target HTML file
+    }, 5890); // 5.89 seconds in milliseconds
   </script>
 </body>
 </html>
