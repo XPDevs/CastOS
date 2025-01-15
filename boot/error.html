@@ -1,0 +1,166 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+   <title>Error 00001</title>
+    <style>
+        body {
+            font-family: "Roboto", sans-serif;
+            background-color: #000000; /* Black background */
+            color: #f0f0f0; /* Light text color */
+            margin: 0;
+            height: 100vh;
+            display: flex;
+            justify-content: center;
+            align-items: center;
+            flex-direction: column;
+        }
+
+        .error-container {
+            background-color: #333; /* Dark gray background for error message */
+            padding: 30px;
+            border-radius: 10px;
+            box-shadow: 0 4px 15px rgba(0, 0, 0, 0.7);
+            width: 400px;
+            text-align: center;
+            z-index: 1;
+        }
+
+        .error-container h1 {
+            font-size: 24px;
+            margin-bottom: 10px;
+            font-weight: normal;
+        }
+
+        .error-container p {
+            font-size: 18px;
+            margin-bottom: 30px;
+        }
+
+        .status-text {
+            font-family: "Courier New", monospace;
+            font-size: 16px;
+            white-space: pre-wrap;
+            word-wrap: break-word;
+            text-align: left;
+            margin-top: 20px;
+            position: absolute;
+            top: 20px;
+            left: 20px;
+            z-index: 0;
+            width: 90%;
+        }
+
+        /* Spinner Styles */
+        .spinner {
+            border: 4px solid transparent;
+            border-top: 4px solid #fff;
+            border-radius: 50%;
+            width: 16px;
+            height: 16px;
+            animation: spin 1s linear infinite;
+            margin-left: 10px;
+            vertical-align: middle;
+        }
+
+        @keyframes spin {
+            0% { transform: rotate(0deg); }
+            100% { transform: rotate(360deg); }
+        }
+    </style>
+</head>
+<body>
+    <div class="error-container" id="error-container">
+<h1>Error 00001</h1>
+        <p>Restarting into restore mode...</p>
+        <p>This may take a few moments.</p>
+    </div>
+
+    <div id="status" class="status-text"></div>
+
+    <script>
+        function simulateBootProcess() {
+            const statusDiv = document.getElementById("status");
+
+            // A larger set of different messages to simulate loading
+            const bootText = [
+                "Initializing system...\n",
+                "Checking file system...\n",
+                "Running hardware diagnostics...\n",
+                "Memory test completed.\n",
+                "Loading kernel...\n",
+                "Kernel loaded successfully.\n",
+                "Mounting file systems...\n",
+                "System status: OK\n",
+                "Starting background processes...\n",
+                "Cleaning temp files...\n",
+                "Checking network connections...\n",
+                "Network connections verified.\n",
+                "Preparing restore...\n",
+                "Restoring data...", // Added restoring message without spinner initially
+                "Restoration successful.\n",
+                "System integrity check...\n",
+                "System integrity OK.\n",
+                "Rebooting system...\n",
+                "Clearing cache...\n",
+                "Cache cleared.\n",
+                "Initializing services...\n",
+                "Services initialized.\n",
+                "Starting applications...\n",
+                "Applications loaded.\n",
+                "Running security check...\n",
+                "Security check passed.\n",
+                "All systems go.\n",
+                "Rebooting...\n"
+            ];
+
+            let index = 0;
+
+            async function displayMessages() {
+                while (index < bootText.length) {
+                    const message = bootText[index];
+                    statusDiv.innerHTML += message;
+                    if (message.includes("Restoring data")) {
+                        // Show spinner and wait for 5 seconds before continuing
+                        await showSpinner();
+                    }
+                    index++;
+                    await new Promise(resolve => setTimeout(resolve, 500)); // Wait for 500ms before displaying next message
+                }
+                setTimeout(() => {
+                    window.location.href = "success.html";  // Redirect to your target file
+                }, 2000); // Redirect after 2 seconds
+            }
+
+            displayMessages();  // Start displaying messages
+        }
+
+        // Show spinner for 5 seconds and pause messages
+        function showSpinner() {
+            const statusDiv = document.getElementById("status");
+            return new Promise(resolve => {
+                const spinner = document.createElement('div');
+                spinner.className = 'spinner';
+                statusDiv.appendChild(spinner);
+
+                setTimeout(() => {
+                    spinner.remove();  // Remove spinner after 5 seconds
+                    resolve(); // Continue with the next message
+                }, 5000); // Wait for 5 seconds
+            });
+        }
+
+        // Wait for the initial message to be visible before clearing and starting the process
+        window.onload = function () {
+            setTimeout(() => {
+                // Clear the existing error message
+                document.getElementById("error-container").style.display = 'none';
+                
+                // Start the boot process after hiding the error message
+                simulateBootProcess();
+            }, 3000); // Wait for 3 seconds before starting the process
+        };
+    </script>
+</body>
+</html>
