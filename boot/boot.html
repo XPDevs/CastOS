@@ -1,73 +1,135 @@
 <!DOCTYPE html>
 <html lang="en">
 <head>
-    <meta charset="UTF-8">
-    <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Spinner</title>
-    <style>
-        /* Fullscreen background */
-        body {
-            margin: 0;
-            height: 100vh;
-            background-color: black;
-            display: flex;
-            justify-content: center;
-            align-items: center;
-        }
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Image Slideshow</title>
+  <style>
+    body {
+      display: flex;
+      justify-content: center;
+      align-items: center;
+      height: 100vh;
+      margin: 0;
+      background-color: #000;
+    }
 
-        .spinner {
-            position: relative;
-            width: 50px;
-            height: 50px;
-        }
-        .spinner div {
-            position: absolute;
-            width: 8px;
-            height: 8px;
-            background-color: #fff;
-            border-radius: 50%;
-            animation: spinner 1.2s cubic-bezier(0.5, 0, 0.5, 1) infinite;
-        }
-        .spinner div:nth-child(1) { top: 0; left: 50%; transform: translate(-50%, -50%); animation-delay: -1.1s; }
-        .spinner div:nth-child(2) { top: 14%; left: 86%; transform: translate(-50%, -50%); animation-delay: -1s; }
-        .spinner div:nth-child(3) { top: 50%; left: 100%; transform: translate(-50%, -50%); animation-delay: -0.9s; }
-        .spinner div:nth-child(4) { top: 86%; left: 86%; transform: translate(-50%, -50%); animation-delay: -0.8s; }
-        .spinner div:nth-child(5) { top: 100%; left: 50%; transform: translate(-50%, -50%); animation-delay: -0.7s; }
-        .spinner div:nth-child(6) { top: 86%; left: 14%; transform: translate(-50%, -50%); animation-delay: -0.6s; }
-        .spinner div:nth-child(7) { top: 50%; left: 0; transform: translate(-50%, -50%); animation-delay: -0.5s; }
-        .spinner div:nth-child(8) { top: 14%; left: 14%; transform: translate(-50%, -50%); animation-delay: -0.4s; }
+    #imageContainer {
+      max-width: 100%;
+      max-height: 100%;
+    }
 
-        @keyframes spinner {
-            0% { transform: scale(1); opacity: 1; }
-            100% { transform: scale(0); opacity: 0; }
-        }
-    </style>
+    #imageContainer img {
+      width: 100%;
+      height: 100%;
+    }
+  </style>
 </head>
 <body>
-    <div class="spinner">
-        <div></div>
-        <div></div>
-        <div></div>
-        <div></div>
-        <div></div>
-        <div></div>
-        <div></div>
-        <div></div>
-    </div>
+  <div id="imageContainer">
+    <!-- Images from the 'animation' folder with names 000.png to 059.png -->
+    <img src="animation/000.png" alt="Image 000">
+    <img src="animation/001.png" alt="Image 001">
+    <img src="animation/002.png" alt="Image 002">
+    <img src="animation/003.png" alt="Image 003">
+    <img src="animation/004.png" alt="Image 004">
+    <img src="animation/005.png" alt="Image 005">
+    <img src="animation/006.png" alt="Image 006">
+    <img src="animation/007.png" alt="Image 007">
+    <img src="animation/008.png" alt="Image 008">
+    <img src="animation/009.png" alt="Image 009">
+    <img src="animation/010.png" alt="Image 010">
+    <img src="animation/011.png" alt="Image 011">
+    <img src="animation/012.png" alt="Image 012">
+    <img src="animation/013.png" alt="Image 013">
+    <img src="animation/014.png" alt="Image 014">
+    <img src="animation/015.png" alt="Image 015">
+    <img src="animation/016.png" alt="Image 016">
+    <img src="animation/017.png" alt="Image 017">
+    <img src="animation/018.png" alt="Image 018">
+    <img src="animation/019.png" alt="Image 019">
+    <img src="animation/020.png" alt="Image 020">
+    <img src="animation/021.png" alt="Image 021">
+    <img src="animation/022.png" alt="Image 022">
+    <img src="animation/023.png" alt="Image 023">
+    <img src="animation/024.png" alt="Image 024">
+    <img src="animation/025.png" alt="Image 025">
+    <img src="animation/026.png" alt="Image 026">
+    <img src="animation/027.png" alt="Image 027">
+    <img src="animation/028.png" alt="Image 028">
+    <img src="animation/029.png" alt="Image 029">
+    <img src="animation/030.png" alt="Image 030">
+    <img src="animation/031.png" alt="Image 031">
+    <img src="animation/032.png" alt="Image 032">
+    <img src="animation/033.png" alt="Image 033">
+    <img src="animation/034.png" alt="Image 034">
+    <img src="animation/035.png" alt="Image 035">
+    <img src="animation/036.png" alt="Image 036">
+    <img src="animation/037.png" alt="Image 037">
+    <img src="animation/038.png" alt="Image 038">
+    <img src="animation/039.png" alt="Image 039">
+    <img src="animation/040.png" alt="Image 040">
+    <img src="animation/041.png" alt="Image 041">
+    <img src="animation/042.png" alt="Image 042">
+    <img src="animation/043.png" alt="Image 043">
+    <img src="animation/044.png" alt="Image 044">
+    <img src="animation/045.png" alt="Image 045">
+    <img src="animation/046.png" alt="Image 046">
+    <img src="animation/047.png" alt="Image 047">
+    <img src="animation/048.png" alt="Image 048">
+    <img src="animation/049.png" alt="Image 049">
+    <img src="animation/050.png" alt="Image 050">
+    <img src="animation/051.png" alt="Image 051">
+    <img src="animation/052.png" alt="Image 052">
+    <img src="animation/053.png" alt="Image 053">
+    <img src="animation/054.png" alt="Image 054">
+    <img src="animation/055.png" alt="Image 055">
+    <img src="animation/056.png" alt="Image 056">
+    <img src="animation/057.png" alt="Image 057">
+    <img src="animation/058.png" alt="Image 058">
+    <img src="animation/059.png" alt="Image 059">
+  </div>
 
-    <script>
-        // Redirect after 5 seconds
-        setTimeout(function() {
-            // Generate a random number between 10 and 20
-            const randomNum = Math.floor(Math.random() * 11) + 10;  // Generates a number between 10 and 20
+  <script>
+    const images = document.querySelectorAll('#imageContainer img');
+    let currentIndex = 0;
+    let loopCount = 0;
+    const maxLoops = 10;
 
-            // If the random number is 10, go to boot2.html, else go to error.html
-            if (randomNum === 10) {
-                window.location.href = 'boot2.html';
-            } else {
-                window.location.href = '../index.html';
-            }
-        }, 5000); // 5 seconds delay
-    </script>
+    // Initially hide all images
+    images.forEach(image => {
+      image.style.display = 'none';
+      console.log(`Hiding image: ${image.src}`);
+    });
+    images[currentIndex].style.display = 'block';
+    console.log(`Displaying image: ${images[currentIndex].src}`);
+
+    function showNextImage() {
+      console.log(`Loop ${loopCount + 1}, Showing image index: ${currentIndex}`);
+
+      images[currentIndex].style.display = 'none';
+      console.log(`Hiding image: ${images[currentIndex].src}`);
+
+      currentIndex = (currentIndex + 1) % images.length;
+      images[currentIndex].style.display = 'block';
+      console.log(`Displaying image: ${images[currentIndex].src}`);
+
+      // Check if all images have been shown once
+      if (currentIndex === 0) {
+        loopCount++;
+        console.log(`Completed loop ${loopCount}`);
+      }
+
+      // If the loop has run 5 times, redirect to the next HTML file
+      if (loopCount >= maxLoops) {
+        console.log('Redirecting to the next page...');
+        window.location.href = "../connect/connect.html"; // Change this to your target HTML file
+      }
+    }
+
+    // Show each image for 30 milliseconds and move to the next
+    console.log('Starting the slideshow...');
+    setInterval(showNextImage, 30); // 30 millisecond interval
+  </script>
 </body>
 </html>
