@@ -3,7 +3,7 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Test Remote Input</title>
+    <title>Gamepad Navigation</title>
     <style>
         body {
             font-family: Arial, sans-serif;
@@ -19,13 +19,51 @@
     </style>
 </head>
 <body>
-    <h1>Press Any Button on Your Remote</h1>
-    <p id="log">No key pressed yet...</p>
+    <h1>Gamepad Navigation</h1>
+    <p id="log">Press buttons on your USB controller...</p>
 
     <script>
-        window.addEventListener('keydown', (event) => {
-            // Display the key name directly in the paragraph
-            document.getElementById('log').innerText = `Key pressed: ${event.key}`;
+        // Function to handle gamepad input
+        function updateGamepad() {
+            const gamepads = navigator.getGamepads ? navigator.getGamepads() : [];
+
+            if (gamepads) {
+                const gamepad = gamepads[0]; // Assuming one gamepad is connected
+
+                if (gamepad) {
+                    // Detecting arrow presses (using the d-pad)
+                    if (gamepad.buttons[12].pressed) { // Up button (D-Pad up)
+                        document.getElementById('log').innerText = 'Arrow Up Pressed';
+                    }
+                    else if (gamepad.buttons[13].pressed) { // Down button (D-Pad down)
+                        document.getElementById('log').innerText = 'Arrow Down Pressed';
+                    }
+                    else if (gamepad.buttons[14].pressed) { // Left button (D-Pad left)
+                        document.getElementById('log').innerText = 'Arrow Left Pressed';
+                    }
+                    else if (gamepad.buttons[15].pressed) { // Right button (D-Pad right)
+                        document.getElementById('log').innerText = 'Arrow Right Pressed';
+                    }
+
+                    // Detecting 'X' (usually button 2)
+                    if (gamepad.buttons[1].pressed) {
+                        document.getElementById('log').innerText = 'X Pressed - Enter';
+                    }
+
+                    // Detecting 'O' (usually button 0)
+                    if (gamepad.buttons[0].pressed) {
+                        document.getElementById('log').innerText = 'O Pressed - Back';
+                    }
+                }
+            }
+
+            // Repeat the check every 100ms
+            requestAnimationFrame(updateGamepad);
+        }
+
+        // Start checking for gamepad input when the page loads
+        window.addEventListener('load', () => {
+            updateGamepad();
         });
     </script>
 </body>
