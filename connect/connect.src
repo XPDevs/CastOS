@@ -305,7 +305,7 @@ cursor: none; /* Hide cursor globally */
 
         peerConnection.oniceconnectionstatechange = () => {
             const connectionStatusElement = document.getElementById('connection-status');
-            
+
             switch (peerConnection.iceConnectionState) {
                 case "new":
                     connectionStatusElement.textContent = "Initializing...";
@@ -379,7 +379,7 @@ cursor: none; /* Hide cursor globally */
                             const img = document.createElement('img');
                             img.src = url;
                             img.alt = "Generated QR Code";
-                            
+
 
                             // Append the generated QR code to the 'qr-code' container
                             const qrContainer = document.getElementById('qr-code');
