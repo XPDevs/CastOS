@@ -3,137 +3,30 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>TV Remote Navigation</title>
+    <title>Test Remote Input</title>
     <style>
         body {
             font-family: Arial, sans-serif;
-            display: flex;
-            justify-content: center;
-            align-items: center;
-            height: 100vh;
-            margin: 0;
+            text-align: center;
+            padding: 50px;
             background-color: #f0f0f0;
         }
-
-        .container {
-            display: grid;
-            grid-template-columns: repeat(2, 200px);
-            gap: 20px;
-            text-align: center;
-        }
-
-        .item {
-            padding: 20px;
-            background-color: #3498db;
-            color: white;
-            border-radius: 8px;
-            cursor: pointer;
-            transition: background-color 0.3s;
-        }
-
-        .item:focus {
-            background-color: #2c3e50;
-        }
-
-        /* Modal Styles */
-        .modal {
-            display: flex;
-            position: fixed;
-            top: 0;
-            left: 0;
-            width: 100%;
-            height: 100%;
-            background-color: rgba(0, 0, 0, 0.5);
-            justify-content: center;
-            align-items: center;
-        }
-
-        .modal-content {
-            background-color: white;
-            padding: 20px;
-            border-radius: 8px;
-            width: 300px;
-            text-align: center;
-        }
-
-        .close-btn {
-            cursor: pointer;
-            padding: 10px;
-            background-color: #e74c3c;
-            color: white;
-            border-radius: 50%;
-            font-size: 18px;
-            position: absolute;
-            top: 10px;
-            right: 10px;
+        #log {
+            font-size: 24px;
+            font-weight: bold;
+            color: #333;
         }
     </style>
 </head>
 <body>
-
-    <div class="container">
-        <div class="item" id="item1" tabindex="0">Item 1</div>
-        <div class="item" id="item2" tabindex="0">Item 2</div>
-        <div class="item" id="item3" tabindex="0">Item 3</div>
-        <div class="item" id="item4" tabindex="0">Item 4</div>
-    </div>
-
-    <!-- Modal -->
-    <div id="modal" class="modal">
-        <div class="modal-content">
-            <h2>Press any button on your TV remote</h2>
-            <p>Once a button is pressed, the navigation will begin.</p>
-        </div>
-    </div>
+    <h1>Press Any Button on Your Remote</h1>
+    <p id="log">No key pressed yet...</p>
 
     <script>
-        // Flag to detect if the modal should be dismissed after key press
-        let modalDismissed = false;
-
-        // Listen for key events from the TV remote (or keyboard)
         window.addEventListener('keydown', (event) => {
-            console.log('Key Code:', event.code); // Log the key code for debugging
-
-            // Only proceed if the modal hasn't been dismissed yet
-            if (!modalDismissed) {
-                // Dismiss the modal on first keypress
-                document.getElementById('modal').style.display = 'none';
-                modalDismissed = true;
-            }
-
-            const items = document.querySelectorAll('.item');
-            let currentFocused = document.activeElement;
-
-            // Arrow key navigation
-            if (event.code === 'ArrowDown') {
-                moveFocus(currentFocused, items, 2); // Move down
-            } else if (event.code === 'ArrowUp') {
-                moveFocus(currentFocused, items, -2); // Move up
-            } else if (event.code === 'ArrowRight') {
-                moveFocus(currentFocused, items, 1); // Move right
-            } else if (event.code === 'ArrowLeft') {
-                moveFocus(currentFocused, items, -1); // Move left
-            } else if (event.code === 'Enter') {
-                alert(`You selected: ${currentFocused.innerText}`);
-            }
+            // Display the key name directly in the paragraph
+            document.getElementById('log').innerText = `Key pressed: ${event.key}`;
         });
-
-        // Function to move focus to the next/previous item
-        function moveFocus(currentFocused, items, direction) {
-            let index = Array.from(items).indexOf(currentFocused);
-
-            if (index !== -1) {
-                const newIndex = index + direction;
-
-                if (newIndex >= 0 && newIndex < items.length) {
-                    items[newIndex].focus();
-                }
-            }
-        }
-
-        // Initially focus the first item
-        document.getElementById('item1').focus();
     </script>
-
 </body>
 </html>
