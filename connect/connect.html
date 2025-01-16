@@ -91,9 +91,8 @@
         let modalDismissed = false;
 
         // Listen for key events from the TV remote (or keyboard)
-        document.addEventListener('keydown', (event) => {
-            console.log('Key Code:', event.keyCode); // Log the key code for debugging
-            console.log('Key Name:', event.key); // Log the key name for debugging
+        window.addEventListener('keydown', (event) => {
+            console.log('Key Code:', event.code); // Log the key code for debugging
 
             // Only proceed if the modal hasn't been dismissed yet
             if (!modalDismissed) {
@@ -106,15 +105,15 @@
             let currentFocused = document.activeElement;
 
             // Arrow key navigation
-            if (event.key === 'ArrowDown') {
+            if (event.code === 'ArrowDown') {
                 moveFocus(currentFocused, items, 2); // Move down
-            } else if (event.key === 'ArrowUp') {
+            } else if (event.code === 'ArrowUp') {
                 moveFocus(currentFocused, items, -2); // Move up
-            } else if (event.key === 'ArrowRight') {
+            } else if (event.code === 'ArrowRight') {
                 moveFocus(currentFocused, items, 1); // Move right
-            } else if (event.key === 'ArrowLeft') {
+            } else if (event.code === 'ArrowLeft') {
                 moveFocus(currentFocused, items, -1); // Move left
-            } else if (event.key === 'Enter') {
+            } else if (event.code === 'Enter') {
                 alert(`You selected: ${currentFocused.innerText}`);
             }
         });
