@@ -3,419 +3,138 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>CastOS Home UI - Peer 2</title>
+    <title>TV Remote Navigation</title>
     <style>
-        /* (Include your CSS styles here) */
         body {
-            margin: 0;
-            padding: 0;
-            height: 100vh;
-            display: flex;
-            justify-content: center;
-            align-items: center;
-            background-image: url("images/bg.jpg"); /* Updated background image path */
-            background-size: cover;
-            background-position: center;
-            background-repeat: no-repeat;
-            transition: background-image 1s ease-in-out;
-            flex-direction: column;
-            text-align: center;
-            position: relative;
             font-family: Arial, sans-serif;
-            color: white;
-cursor: none; /* Hide cursor globally */
-        }
-
-    /* Custom cursor style */
-    .cursor {
-      position: absolute;
-      width: 32px; /* Customize the size of the cursor */
-      height: 32px;
-      background-image: url('../ui/cursor/cursor.ico'); /* Custom cursor image (ICO file) */
-      background-size: contain;
-      pointer-events: none;
-      transform: translate(-50%, -50%);
-      z-index: 9999;
-cursor: none; /* Hide cursor globally */
-    }
-
-        .clock, .date {
-            position: absolute;
-            bottom: 20px;
-            left: 50%;
-            transform: translateX(-50%);
-            text-shadow: 0 0 5px rgba(0, 0, 0, 0.7);
-cursor: none; /* Hide cursor globally */
-        }
-
-        .clock {
-            font-size: 2rem;
-            margin-bottom: 20px;
-cursor: none; /* Hide cursor globally */
-        }
-
-        .date {
-            font-size: 1.2rem;
-cursor: none; /* Hide cursor globally */
-        }
-
-        .top-right {
-            position: absolute;
-            top: 10px;
-            right: 10px;
-            display: flex;
-            align-items: center;
-            color: white;
-            text-shadow: 0 0 5px rgba(0, 0, 0, 0.7);
-            flex-direction: row;
-cursor: none; /* Hide cursor globally */
-        }
-
-        .top-right img {
-            width: 35px;
-            height: 35px;
-            margin-left: 10px;
-cursor: none; /* Hide cursor globally */
-        }
-
-        .connection-status {
-            font-size: 1.2rem;
-            margin-left: 10px;
-cursor: none; /* Hide cursor globally */
-        }
-
-        .webrtc-container {
-            position: absolute;
-            bottom: 80px;
-            left: 50%;
-            transform: translateX(-50%);
-            width: 100%;
-            max-width: 400px;
-cursor: none; /* Hide cursor globally */
-        }
-
-        #qr-code {
-            margin-bottom: 20px;
             display: flex;
             justify-content: center;
-cursor: none; /* Hide cursor globally */
+            align-items: center;
+            height: 100vh;
+            margin: 0;
+            background-color: #f0f0f0;
         }
 
-        .buttons button {
-            padding: 10px 20px;
-            font-size: 1rem;
-            cursor: none; /* Hide cursor globally */
-            border: none;
-            background: rgba(255, 255, 255, 0.2);
-            border-radius: 5px;
-            margin: 10px;
+        .container {
+            display: grid;
+            grid-template-columns: repeat(2, 200px);
+            gap: 20px;
+            text-align: center;
+        }
+
+        .item {
+            padding: 20px;
+            background-color: #3498db;
             color: white;
-            transition: background 0.3s ease;
+            border-radius: 8px;
+            cursor: pointer;
+            transition: background-color 0.3s;
         }
 
-        .buttons button:hover {
-            background: rgba(255, 255, 255, 0.4);
-cursor: none; /* Hide cursor globally */
+        .item:focus {
+            background-color: #2c3e50;
         }
 
-        #offer-input {
-            width: 100%;
-            padding: 10px;
-            font-size: 1rem;
-            margin-top: 20px;
-            border: 1px solid rgba(255, 255, 255, 0.3);
-            background: rgba(0, 0, 0, 0.6);
-            color: white;
-            border-radius: 5px;
-cursor: none; /* Hide cursor globally */
-        }
-
+        /* Modal Styles */
         .modal {
-            display: none;
+            display: flex;
             position: fixed;
-            z-index: 1;
-            left: 0;
             top: 0;
+            left: 0;
             width: 100%;
             height: 100%;
-            overflow: auto;
             background-color: rgba(0, 0, 0, 0.5);
-            padding-top: 60px;
-cursor: none; /* Hide cursor globally */
+            justify-content: center;
+            align-items: center;
         }
 
         .modal-content {
-            background-color: #2c2c2c;
-            margin: 5% auto;
+            background-color: white;
             padding: 20px;
-            border-radius: 5px;
-            width: 80%;
-            max-width: 400px;
-cursor: none; /* Hide cursor globally */
+            border-radius: 8px;
+            width: 300px;
+            text-align: center;
         }
 
-        .modal-header {
-            font-size: 1.2rem;
-            font-weight: bold;
-            color: white;
-cursor: none; /* Hide cursor globally */
-        }
-
-        .modal-body {
-            margin-top: 10px;
-            font-size: 1rem;
-            color: white;
-cursor: none; /* Hide cursor globally */
-        }
-
-        .modal-footer {
-            text-align: right;
-            margin-top: 20px;
-cursor: none; /* Hide cursor globally */
-        }
-
-        .modal-footer button {
-            padding: 10px 15px;
+        .close-btn {
             cursor: pointer;
-            background: rgba(255, 255, 255, 0.2);
-            border-radius: 5px;
+            padding: 10px;
+            background-color: #e74c3c;
             color: white;
-            transition: background 0.3s ease;
-cursor: none; /* Hide cursor globally */
-        }
-
-        .modal-footer button:hover {
-            background: rgba(255, 255, 255, 0.4);
-cursor: none; /* Hide cursor globally */
-        }
-
-        .close {
-            color: white;
-            font-size: 28px;
-            font-weight: bold;
-            float: right;
-            cursor: pointer;
-cursor: none; /* Hide cursor globally */
-        }
-
-        .close:hover,
-        .close:focus {
-            color: #aaa;
-            text-decoration: none;
-cursor: none; /* Hide cursor globally */
-        }
-
-        /* New styles for the restart popup */
-        #restart-popup {
+            border-radius: 50%;
+            font-size: 18px;
             position: absolute;
             top: 10px;
-            left: 10px;
-            background-color: rgba(0, 0, 0, 0.7);
-            color: white;
-            padding: 10px;
-            border-radius: 5px;
-            display: none;
-cursor: none; /* Hide cursor globally */
-        }
-
-        #restart-popup button {
-            background-color: rgba(255, 255, 255, 0.2);
-            color: white;
-            border: none;
-            padding: 8px;
-            border-radius: 5px;
-cursor: none; /* Hide cursor globally */
-        }
-
-        #restart-popup button:hover {
-            background-color: rgba(255, 255, 255, 0.4);
-cursor: none; /* Hide cursor globally */
+            right: 10px;
         }
     </style>
 </head>
 <body>
- <div class="cursor" id="cursor"></div>
-    <div class="top-right">
-        <span id="connection-status" class="connection-status"></span>
-        <img src="images/cast.svg" alt="Icon">
+
+    <div class="container">
+        <div class="item" id="item1" tabindex="0">Item 1</div>
+        <div class="item" id="item2" tabindex="0">Item 2</div>
+        <div class="item" id="item3" tabindex="0">Item 3</div>
+        <div class="item" id="item4" tabindex="0">Item 4</div>
     </div>
 
-    <div id="restart-popup">
-        <p>Restart the system</p>
-        <button onclick="restartPage()">Restart</button>
-    </div>
-
-    <div class="clock" id="clock"></div>
-    <div class="date" id="date"></div>
-
-    <div class="webrtc-container">
-        <div id="qr-code"></div>
-        <div class="buttons">
-            <button id="generate-answer">Generate Answer</button>
-        </div>
-
-        <textarea id="offer-input" placeholder="Paste the offer from Peer 1 here"></textarea>
-    </div>
-
+    <!-- Modal -->
     <div id="modal" class="modal">
         <div class="modal-content">
-            <div class="modal-header">
-                <span class="close">&times;</span>
-                <h2>Message</h2>
-            </div>
-            <div class="modal-body" id="modal-body">
-                <!-- Dynamic message will be inserted here -->
-            </div>
-            <div class="modal-footer">
-                <button id="modal-close-button">Close</button>
-            </div>
+            <h2>Press any button on your TV remote</h2>
+            <p>Once a button is pressed, the navigation will begin.</p>
         </div>
     </div>
 
-    <script src="https://cdn.jsdelivr.net/npm/qrcode/build/qrcode.min.js"></script>
     <script>
-        const modal = document.getElementById("modal");
-        const closeModal = document.getElementsByClassName("close")[0];
-        const modalBody = document.getElementById("modal-body");
-        const closeButton = document.getElementById("modal-close-button");
+        // Flag to detect if the modal should be dismissed after key press
+        let modalDismissed = false;
 
-        function showModal(message) {
-            modalBody.textContent = message;
-            modal.style.display = "block";
-        }
+        // Listen for key events from the TV remote (or keyboard)
+        document.addEventListener('keydown', (event) => {
+            console.log('Key Code:', event.keyCode); // Log the key code for debugging
+            console.log('Key Name:', event.key); // Log the key name for debugging
 
-        closeModal.onclick = function() {
-            modal.style.display = "none";
-        }
-
-        closeButton.onclick = function() {
-            modal.style.display = "none";
-        }
-
-        // Show restart popup
-        document.getElementById("restart-popup").style.display = "block";
-
-        function restartPage() {
-            window.location.href = "../index.html"; // Redirect to the main page
-        }
-
-        const peerConnection = new RTCPeerConnection();
-        let localStream = null;
-        let remoteStream = null;
-
-        peerConnection.oniceconnectionstatechange = () => {
-            const connectionStatusElement = document.getElementById('connection-status');
-            
-            switch (peerConnection.iceConnectionState) {
-                case "new":
-                    connectionStatusElement.textContent = "Initializing...";
-                    break;
-                case "checking":
-                    connectionStatusElement.textContent = "Checking connection...";
-                    break;
-                case "connected":
-                    connectionStatusElement.textContent = "Connected";
-                    break;
-                case "disconnected":
-                    connectionStatusElement.textContent = "Disconnected";
-                    break;
-                case "failed":
-                    connectionStatusElement.textContent = "Connection failed";
-                    break;
-                case "closed":
-                    connectionStatusElement.textContent = "Connection closed";
-                    break;
-                default:
-                    connectionStatusElement.textContent = "Unknown status";
+            // Only proceed if the modal hasn't been dismissed yet
+            if (!modalDismissed) {
+                // Dismiss the modal on first keypress
+                document.getElementById('modal').style.display = 'none';
+                modalDismissed = true;
             }
-        };
 
-        const images = ['images/bg.jpg'];
-        let currentIndex = 0;
+            const items = document.querySelectorAll('.item');
+            let currentFocused = document.activeElement;
 
-        function changeBackground() {
-            currentIndex = (currentIndex + 1) % images.length;
-            const nextImage = images[currentIndex];
-            document.body.style.backgroundImage = `url('${nextImage}')`;
-        }
-
-        setInterval(changeBackground, 10000);
-        changeBackground();
-
-        function updateClockAndDate() {
-            const clockElement = document.getElementById('clock');
-            const dateElement = document.getElementById('date');
-            const now = new Date();
-            const hours = String(now.getHours()).padStart(2, '0');
-            const minutes = String(now.getMinutes()).padStart(2, '0');
-            const date = now.toLocaleDateString('en-US', {
-                weekday: 'long',
-                year: 'numeric',
-                month: 'long',
-                day: 'numeric'
-            });
-
-            clockElement.textContent = `${hours}:${minutes}`;
-            dateElement.textContent = date;
-        }
-
-        setInterval(updateClockAndDate, 60000);
-        updateClockAndDate();
-
-        document.getElementById('generate-answer').addEventListener('click', function() {
-            try {
-                const offer = document.getElementById('offer-input').value.trim();  // Ensure there's no leading/trailing whitespace
-                if (offer && offer !== "") {  // Check if the offer is non-empty
-                    const answer = generateAnswerFromOffer(offer);  // Generate the answer based on the offer
-                    console.log("Generated answer based on offer:", answer);  // Log the answer being generated
-
-                    // Try generating QR code
-                    QRCode.toDataURL(answer, function(error, url) {
-                        if (error) {
-                            showModal("Error generating QR code: " + error.message);
-                            console.error("Error generating QR code:", error);
-                        } else {
-                            // Create an image element to display the QR code
-                            const img = document.createElement('img');
-                            img.src = url;
-                            img.alt = "Generated QR Code";
-                            
-
-                            // Append the generated QR code to the 'qr-code' container
-                            const qrContainer = document.getElementById('qr-code');
-                            qrContainer.innerHTML = '';  // Clear previous content (if any)
-                            qrContainer.appendChild(img);
-
-                            console.log("QR code generated successfully");
-
-                            // Close the QR code modal
-                            modal.style.display = "none";
-                        }
-                    });
-                } else {
-                    showModal("Please provide a valid offer from Peer 1.");
-                    console.log("Offer input is empty or invalid");
-                }
-            } catch (error) {
-                showModal("Error generating answer: " + error.message);
-                console.error("Error generating answer:", error);
+            // Arrow key navigation
+            if (event.key === 'ArrowDown') {
+                moveFocus(currentFocused, items, 2); // Move down
+            } else if (event.key === 'ArrowUp') {
+                moveFocus(currentFocused, items, -2); // Move up
+            } else if (event.key === 'ArrowRight') {
+                moveFocus(currentFocused, items, 1); // Move right
+            } else if (event.key === 'ArrowLeft') {
+                moveFocus(currentFocused, items, -1); // Move left
+            } else if (event.key === 'Enter') {
+                alert(`You selected: ${currentFocused.innerText}`);
             }
         });
 
-        // Implement a function to generate an answer from the offer (example logic)
-        function generateAnswerFromOffer(offer) {
-            // Example logic: create a valid WebRTC answer from the offer
-            let answer = "Generated Answer: " + offer;
-            return answer;
+        // Function to move focus to the next/previous item
+        function moveFocus(currentFocused, items, direction) {
+            let index = Array.from(items).indexOf(currentFocused);
+
+            if (index !== -1) {
+                const newIndex = index + direction;
+
+                if (newIndex >= 0 && newIndex < items.length) {
+                    items[newIndex].focus();
+                }
+            }
         }
 
-    const cursor = document.getElementById('cursor');
-
-    // Track mouse movement and set the custom cursor position
-    document.addEventListener('mousemove', (e) => {
-      cursor.style.left = `${e.pageX}px`;
-      cursor.style.top = `${e.pageY}px`;
-    });
+        // Initially focus the first item
+        document.getElementById('item1').focus();
     </script>
+
 </body>
 </html>
