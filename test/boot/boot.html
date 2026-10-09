@@ -1,0 +1,128 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>CastOS</title>
+  <link rel="icon" type="image/svg+xml" href="../assets/cast.svg">
+  <style>
+    body {
+      margin: 0;
+      height: 100vh;
+      background: #000;
+      color: #cfd6ea;
+      font-family: "Segoe UI", Roboto, Arial, sans-serif;
+      display: flex;
+      flex-direction: column;
+      align-items: center;
+      justify-content: center;
+      gap: 26px;
+      cursor: none;
+      overflow: hidden;
+    }
+
+    #imageContainer {
+      position: relative;
+      width: min(1080px, 88vw);
+      aspect-ratio: 1080 / 230;
+    }
+
+    #imageContainer img {
+      position: absolute;
+      inset: 0;
+      width: 100%;
+      height: 100%;
+      object-fit: contain;
+      opacity: 0;
+      transition: opacity 70ms linear;
+    }
+
+    #imageContainer img.on { opacity: 1; }
+
+    #bar {
+      width: min(420px, 70vw);
+      height: 4px;
+      border-radius: 99px;
+      background: rgba(255, 255, 255, 0.14);
+      overflow: hidden;
+    }
+
+    #bar i {
+      display: block;
+      height: 100%;
+      width: 0;
+      background: linear-gradient(90deg, #6c5ce7, #22d3ee);
+      transition: width 120ms linear;
+    }
+
+    #note {
+      font-size: 12px;
+      letter-spacing: 0.32em;
+      text-transform: uppercase;
+      color: #7b86a5;
+    }
+  </style>
+</head>
+<body>
+  <div id="imageContainer"></div>
+  <div id="bar"><i></i></div>
+  <div id="note">starting castos</div>
+
+  <script>
+    (function () {
+      var TOTAL = 60;
+      var host = document.getElementById("imageContainer");
+      var fill = document.querySelector("#bar i");
+      var note = document.getElementById("note");
+      var frames = [];
+      var flaky = /[?&]flaky=1/.test(location.search);
+
+      for (var i = 0; i < TOTAL; i += 1) {
+        var img = document.createElement("img");
+        img.src = "animation/" + String(i).padStart(3, "0") + ".png";
+        img.alt = "";
+        img.draggable = false;
+        host.appendChild(img);
+        frames.push(img);
+      }
+
+      function ready() {
+        return Promise.all(frames.map(function (img) {
+          return new Promise(function (resolve) {
+            if (img.complete) { resolve(); return; }
+            img.onload = img.onerror = resolve;
+          });
+        }));
+      }
+
+      ready().then(function () {
+        var index = 0;
+        var timer = setInterval(function () {
+          frames.forEach(function (f) { f.classList.remove("on"); });
+          if (frames[index]) frames[index].classList.add("on");
+          fill.style.width = Math.round((index / (TOTAL - 1)) * 100) + "%";
+          index += 1;
+          if (index >= TOTAL) {
+            clearInterval(timer);
+            fill.style.width = "100%";
+            setTimeout(go, 240);
+          }
+        }, 42);
+      });
+
+      function go() {
+        if (flaky && Math.random() < 0.2) {
+          note.textContent = "boot failed";
+          window.location.href = "error.html";
+          return;
+        }
+        window.location.href = "../receiver.html";
+      }
+
+      setTimeout(function () {
+        window.location.href = "../receiver.html";
+      }, 12000);
+    })();
+  </script>
+</body>
+</html>

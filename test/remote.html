@@ -1,0 +1,169 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no, viewport-fit=cover">
+  <meta name="theme-color" content="#05070d">
+  <meta name="apple-mobile-web-app-capable" content="yes">
+  <meta name="mobile-web-app-capable" content="yes">
+  <title>CastOS Remote</title>
+  <link rel="icon" type="image/svg+xml" href="assets/cast.svg">
+  <link rel="stylesheet" href="css/remote.css">
+</head>
+<body>
+  <div id="app">
+    <header id="r-top">
+      <div class="rt-left">
+        <span id="r-dot" class="dot off"></span>
+        <span id="r-title">CastOS remote</span>
+      </div>
+      <div class="rt-right">
+        <span id="r-ping" class="chip">-</span>
+        <span id="r-batt" class="chip" hidden></span>
+        <button id="r-menu" class="icon-btn" aria-label="menu">
+          <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><circle cx="5" cy="12" r="1.6"/><circle cx="12" cy="12" r="1.6"/><circle cx="19" cy="12" r="1.6"/></svg>
+        </button>
+      </div>
+    </header>
+
+    <section id="screen-pair" class="screen">
+      <div class="hero">
+        <img src="assets/cast.svg" alt="">
+        <h1>CastOS remote</h1>
+        <p>Point your phone at the QR code on the CastOS screen. If you opened this page from a link, pairing starts on its own.</p>
+      </div>
+
+      <div class="card" id="card-paste">
+        <label for="p-code">Paste pairing code</label>
+        <textarea id="p-code" rows="3" placeholder="The code from the CastOS screen"></textarea>
+        <div class="row">
+          <button class="btn primary" id="p-go">Pair</button>
+          <button class="btn" id="p-scan">Scan QR</button>
+        </div>
+      </div>
+
+      <div class="card" id="card-answer" hidden>
+        <h2>Show this to the screen</h2>
+        <p class="hint">Scan this code with the CastOS screen camera, or send it over.</p>
+        <div class="qr-wrap"><div id="a-qr"></div></div>
+        <div class="row">
+          <button class="btn primary" id="a-copy">Copy code</button>
+          <button class="btn ghost" id="a-share">Share</button>
+        </div>
+        <div id="a-status" class="status">waiting for the screen...</div>
+      </div>
+
+      <div class="card" id="card-relay">
+        <label for="r-code">Same network code</label>
+        <input id="r-code" maxlength="6" placeholder="ABC123" autocomplete="off" spellcheck="false">
+        <div class="row">
+          <button class="btn" id="r-go">Use code</button>
+        </div>
+        <p class="hint">Only when both devices share the network and <code>python server.py</code> is running.</p>
+      </div>
+    </section>
+
+    <section id="screen-pad" class="screen" hidden>
+      <div class="pad-wrap" id="pad-panel">
+        <div class="dpad">
+          <button class="dbtn up" data-key="ArrowUp" data-focus>
+            <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.2"><path d="M5 14l7-7 7 7"/></svg>
+          </button>
+          <button class="dbtn left" data-key="ArrowLeft" data-focus>
+            <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.2"><path d="M14 5l-7 7 7 7"/></svg>
+          </button>
+          <button class="dbtn ok" data-key="Enter" data-focus>OK</button>
+          <button class="dbtn right" data-key="ArrowRight" data-focus>
+            <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.2"><path d="M10 5l7 7-7 7"/></svg>
+          </button>
+          <button class="dbtn down" data-key="ArrowDown" data-focus>
+            <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.2"><path d="M5 10l7 7 7-7"/></svg>
+          </button>
+        </div>
+
+        <div class="btn-grid three">
+          <button class="btn" data-cmd="back" data-focus>Back</button>
+          <button class="btn" data-cmd="home" data-focus>Home</button>
+          <button class="btn" data-cmd="menu" data-focus>Menu</button>
+        </div>
+
+        <div class="vol-row">
+          <button class="btn round" data-cmd="voldown" data-focus aria-label="volume down">&#8722;</button>
+          <button class="btn round" data-cmd="mute" data-focus aria-label="mute">&#128263;</button>
+          <span id="vol-label" class="vol-label">50%</span>
+          <button class="btn round" data-cmd="volup" data-focus aria-label="volume up">&#43;</button>
+        </div>
+
+        <div class="btn-grid four">
+          <button class="btn" data-cmd="prev" data-focus>&#9198;</button>
+          <button class="btn wide" data-cmd="playpause" data-focus>&#9209;&#9209;</button>
+          <button class="btn" data-cmd="next" data-focus>&#9197;</button>
+          <button class="btn" data-cmd="fullscreen" data-focus>Full</button>
+        </div>
+      </div>
+
+      <div class="pad-wrap" id="touch-panel" hidden>
+        <div id="trackpad" data-focus>
+          <span class="tp-hint">drag to move &middot; tap to click &middot; hold for right click &middot; two fingers to scroll</span>
+        </div>
+        <div class="btn-grid three">
+          <button class="btn" id="tp-left" data-focus>Left click</button>
+          <button class="btn" id="tp-right" data-focus>Right click</button>
+          <button class="btn" id="tp-up" data-focus>Scroll up</button>
+        </div>
+        <div class="btn-grid two">
+          <button class="btn" id="tp-down" data-focus>Scroll down</button>
+          <button class="btn" id="tp-center" data-focus>Center cursor</button>
+        </div>
+      </div>
+
+      <div class="pad-wrap" id="keys-panel" hidden>
+        <div class="row">
+          <input id="k-text" class="field" placeholder="type on the screen" autocomplete="off" autocapitalize="off" spellcheck="false" data-focus>
+          <button class="btn primary" id="k-send" data-focus>Send</button>
+        </div>
+        <div class="key-grid" id="k-keys"></div>
+        <div class="row">
+          <input id="k-url" class="field" placeholder="website or youtube link" autocomplete="off" spellcheck="false" data-focus>
+          <button class="btn" id="k-open" data-focus>Open</button>
+          <button class="btn" id="k-play" data-focus>Cast video</button>
+        </div>
+      </div>
+
+      <div class="pad-wrap" id="apps-panel" hidden>
+        <div class="app-grid" id="app-grid"></div>
+      </div>
+    </section>
+
+    <nav id="r-tabs" hidden>
+      <button class="tab active" data-tab="pad" data-focus>
+        <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.9"><circle cx="12" cy="12" r="9"/><path d="M12 7v5l3 2"/></svg>
+        pad
+      </button>
+      <button class="tab" data-tab="touch" data-focus>
+        <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.9"><path d="M8 12V6.5a1.5 1.5 0 013 0V11"/><path d="M11 11V5a1.5 1.5 0 013 0v6"/><path d="M14 11V6.5a1.5 1.5 0 013 0V15a6 6 0 01-6 6H9.5a5 5 0 01-4.2-2.3L3 15l3.5-1.5"/></svg>
+        touch
+      </button>
+      <button class="tab" data-tab="keys" data-focus>
+        <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.9"><rect x="2.5" y="6" width="19" height="12" rx="2.4"/><path d="M7 10h.01M11 10h.01M15 10h.01M7 14h10"/></svg>
+        keys
+      </button>
+      <button class="tab" data-tab="apps" data-focus>
+        <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.9"><rect x="3.5" y="3.5" width="7" height="7" rx="1.8"/><rect x="13.5" y="3.5" width="7" height="7" rx="1.8"/><rect x="3.5" y="13.5" width="7" height="7" rx="1.8"/><rect x="13.5" y="13.5" width="7" height="7" rx="1.8"/></svg>
+        apps
+      </button>
+    </nav>
+
+    <div id="scan-overlay" hidden>
+      <video id="scan-video" playsinline></video>
+      <div id="scan-frame"></div>
+      <button class="btn" id="scan-cancel" data-focus>Cancel</button>
+    </div>
+  </div>
+
+  <script src="js/qr.js"></script>
+  <script src="js/castos-core.js"></script>
+  <script src="js/castos-link.js"></script>
+  <script src="js/remote.js"></script>
+</body>
+</html>

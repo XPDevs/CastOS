@@ -1,0 +1,114 @@
+:root {
+  --bg: #05070d;
+  --panel: rgba(16, 20, 32, 0.78);
+  --line: rgba(255, 255, 255, 0.12);
+  --text: #eef2ff;
+  --muted: #9aa6c4;
+  --accent: #6c5ce7;
+  --accent-2: #22d3ee;
+  --font: "Segoe UI", Roboto, "Helvetica Neue", Arial, sans-serif;
+}
+
+* { box-sizing: border-box; }
+
+body {
+  margin: 0;
+  min-height: 100vh;
+  background:
+    radial-gradient(90% 60% at 20% 0%, rgba(108, 92, 231, 0.28), transparent 60%),
+    radial-gradient(70% 50% at 90% 20%, rgba(34, 211, 238, 0.18), transparent 60%),
+    var(--bg);
+  color: var(--text);
+  font-family: var(--font);
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  padding: 28px 18px;
+}
+
+.wrap { width: min(760px, 100%); }
+
+.brand { text-align: center; margin-bottom: 26px; }
+
+.brand img { width: 54px; height: 54px; }
+
+.brand h1 {
+  margin: 12px 0 8px;
+  font-size: clamp(30px, 6vw, 44px);
+  letter-spacing: -0.02em;
+}
+
+.brand p {
+  margin: 0 auto;
+  max-width: 46ch;
+  color: var(--muted);
+  font-size: 14px;
+  line-height: 1.65;
+}
+
+.cards {
+  display: grid;
+  grid-template-columns: repeat(auto-fit, minmax(240px, 1fr));
+  gap: 14px;
+  margin-bottom: 22px;
+}
+
+.card {
+  position: relative;
+  display: flex;
+  flex-direction: column;
+  gap: 8px;
+  padding: 20px;
+  border-radius: 20px;
+  border: 1px solid var(--line);
+  background: var(--panel);
+  text-decoration: none;
+  color: var(--text);
+  backdrop-filter: blur(12px);
+  transition: transform 150ms ease, border-color 150ms ease, background 150ms ease;
+}
+
+.card:hover, .card:focus-visible {
+  transform: translateY(-3px);
+  border-color: rgba(108, 92, 231, 0.7);
+  outline: none;
+}
+
+.card.primary {
+  background: linear-gradient(150deg, rgba(108, 92, 231, 0.42), rgba(16, 20, 32, 0.85));
+  border-color: rgba(108, 92, 231, 0.55);
+}
+
+.card strong { font-size: 17px; }
+
+.card small { color: var(--muted); font-size: 13px; line-height: 1.55; }
+
+.tag {
+  align-self: flex-start;
+  font-size: 10px;
+  letter-spacing: 0.16em;
+  text-transform: uppercase;
+  padding: 4px 9px;
+  border-radius: 999px;
+  background: rgba(108, 92, 231, 0.35);
+  border: 1px solid rgba(108, 92, 231, 0.5);
+}
+
+.tag.alt { background: rgba(34, 211, 238, 0.2); border-color: rgba(34, 211, 238, 0.45); }
+
+.steps {
+  margin: 0 0 18px;
+  padding-left: 20px;
+  color: var(--muted);
+  font-size: 13px;
+  line-height: 1.9;
+}
+
+.steps b { color: var(--text); }
+
+.foot {
+  text-align: center;
+  color: var(--muted);
+  font-size: 12px;
+  margin: 0;
+}

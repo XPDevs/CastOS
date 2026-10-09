@@ -1,0 +1,53 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0, viewport-fit=cover">
+  <meta name="theme-color" content="#05070d">
+  <title>CastOS</title>
+  <link rel="icon" type="image/svg+xml" href="assets/cast.svg">
+  <link rel="stylesheet" href="css/launcher.css">
+</head>
+<body>
+  <main class="wrap">
+    <div class="brand">
+      <img src="assets/cast.svg" alt="">
+      <h1>CastOS</h1>
+      <p>Turn any browser into a cast screen. No cables, no account, no server. Works across different networks.</p>
+    </div>
+
+    <div class="cards">
+      <a class="card primary" href="receiver.html">
+        <span class="tag">this device</span>
+        <strong>Use as CastOS screen</strong>
+        <small>Shows the pairing code and receives controls from a phone.</small>
+      </a>
+      <a class="card" href="remote.html">
+        <span class="tag alt">phone</span>
+        <strong>Open the remote</strong>
+        <small>Pair by scanning the code on a CastOS screen.</small>
+      </a>
+    </div>
+
+    <ol class="steps">
+      <li>Open <b>Use as CastOS screen</b> on the TV, laptop or monitor you want to control.</li>
+      <li>Scan the pairing code with your phone camera, or open the remote and paste the code.</li>
+      <li>Send the answer code back and control the screen from anywhere.</li>
+    </ol>
+
+    <p class="foot">All traffic is peer to peer over WebRTC. Nothing is stored on a server.</p>
+  </main>
+
+  <script src="js/castos-core.js"></script>
+  <script>
+    (function () {
+      var params = CastOS.hashParams();
+      if (params.o) {
+        window.location.replace("remote.html#o=" + encodeURIComponent(params.o));
+      } else if (params.c) {
+        window.location.replace("remote.html#c=" + encodeURIComponent(params.c));
+      }
+    })();
+  </script>
+</body>
+</html>

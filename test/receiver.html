@@ -1,0 +1,197 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0, viewport-fit=cover">
+  <meta name="theme-color" content="#05070d">
+  <title>CastOS - Cast Device</title>
+  <link rel="icon" type="image/svg+xml" href="assets/cast.svg">
+  <link rel="stylesheet" href="css/receiver.css">
+</head>
+<body>
+  <div id="stage">
+    <div id="boot">
+      <div id="boot-frame"></div>
+      <div id="boot-bar"><i></i></div>
+      <div id="boot-note">starting castos</div>
+    </div>
+
+    <div id="desktop" hidden>
+      <div id="wallpaper"></div>
+      <div id="scrim"></div>
+
+      <header id="topbar">
+        <div class="tb-left">
+          <img class="logo" src="assets/cast.svg" alt="">
+          <span class="devname" id="device-name">CastOS Screen</span>
+        </div>
+        <div class="tb-center">
+          <span id="clock">--:--</span>
+          <span id="date"></span>
+        </div>
+        <div class="tb-right">
+          <span class="chip" id="remote-name" hidden></span>
+          <span class="pill off" id="conn-pill">not connected</span>
+          <span class="chip" id="vol-chip">vol 50%</span>
+        </div>
+      </header>
+
+      <nav id="dock">
+        <button class="dock-btn active" data-app="home" data-focus>
+          <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8"><path d="M3 10.5 12 3l9 7.5"/><path d="M5.5 9.5V21h13V9.5"/></svg>
+          home
+        </button>
+        <button class="dock-btn" data-app="browser" data-focus>
+          <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8"><circle cx="12" cy="12" r="9"/><path d="M3 12h18M12 3c2.6 3 2.6 15 0 18M12 3c-2.6 3-2.6 15 0 18"/></svg>
+          web
+        </button>
+        <button class="dock-btn" data-app="media" data-focus>
+          <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8"><rect x="2.5" y="4.5" width="19" height="15" rx="3"/><path d="M10 9l5 3-5 3z" fill="currentColor" stroke="none"/></svg>
+          media
+        </button>
+        <button class="dock-btn" data-app="notes" data-focus>
+          <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8"><path d="M5 3h9l5 5v13H5z"/><path d="M14 3v5h5M8 13h8M8 17h5"/></svg>
+          notes
+        </button>
+        <button class="dock-btn" data-app="photos" data-focus>
+          <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8"><rect x="3" y="4.5" width="18" height="15" rx="3"/><circle cx="8.5" cy="10" r="1.8"/><path d="M4 18l5.5-5 4 3.5L17 12l3 3.5"/></svg>
+          photos
+        </button>
+        <button class="dock-btn" data-app="settings" data-focus>
+          <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8"><circle cx="12" cy="12" r="3.2"/><path d="M12 2.5v2.6M12 18.9v2.6M4.2 7.2l2.2 1.3M17.6 15.5l2.2 1.3M4.2 16.8l2.2-1.3M17.6 8.5l2.2-1.3"/></svg>
+          setup
+        </button>
+        <button class="dock-btn" id="pair-btn" data-focus>
+          <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8"><rect x="3" y="3" width="7" height="7" rx="1.6"/><rect x="14" y="3" width="7" height="7" rx="1.6"/><rect x="3" y="14" width="7" height="7" rx="1.6"/><path d="M14 14h3v3h-3zM19 19h2v2h-2z"/></svg>
+          pair
+        </button>
+      </nav>
+
+      <main id="windows">
+        <section class="window open" id="win-home">
+          <div class="win-bar"><span class="win-title">Home</span></div>
+          <div class="win-body">
+            <div class="row" style="margin-bottom:16px">
+              <button class="btn primary" id="home-pair" data-focus>Pair a phone</button>
+              <button class="btn ghost" id="home-full" data-focus>Fullscreen</button>
+            </div>
+            <div class="tile-grid" id="home-tiles"></div>
+          </div>
+        </section>
+
+        <section class="window" id="win-browser">
+          <div class="win-bar">
+            <span class="win-title">Web</span>
+            <input class="field" id="browser-url" data-focus placeholder="example.com" value="https://en.m.wikipedia.org">
+            <button class="btn" id="browser-go" data-focus>Go</button>
+          </div>
+          <iframe id="browser-frame" title="web" referrerpolicy="no-referrer"></iframe>
+        </section>
+
+        <section class="window" id="win-media">
+          <div class="win-bar">
+            <span class="win-title">Media</span>
+            <input class="field" id="media-url" data-focus placeholder="paste a YouTube link or id">
+            <button class="btn" id="media-play" data-focus>Play</button>
+          </div>
+          <div class="win-body">
+            <div class="media-grid" id="media-list"></div>
+          </div>
+          <iframe id="media-frame" title="media" allow="autoplay; encrypted-media; fullscreen" allowfullscreen style="flex:1;border:0;background:#000"></iframe>
+        </section>
+
+        <section class="window" id="win-notes">
+          <div class="win-bar">
+            <span class="win-title">Notes</span>
+            <button class="btn" id="notes-clear" data-focus>Clear</button>
+          </div>
+          <div class="win-body">
+            <textarea id="notes-area" data-focus placeholder="Type from your phone remote..."></textarea>
+          </div>
+        </section>
+
+        <section class="window" id="win-photos">
+          <div class="win-bar"><span class="win-title">Photos</span><span class="chip" id="photo-count"></span></div>
+          <div class="win-body" style="display:flex;align-items:center;justify-content:center">
+            <div id="photo-stage" style="max-width:100%;max-height:100%;aspect-ratio:16/9;width:min(880px,100%);border-radius:16px;border:1px solid var(--line);overflow:hidden"></div>
+          </div>
+        </section>
+
+        <section class="window" id="win-settings">
+          <div class="win-bar"><span class="win-title">Settings</span></div>
+          <div class="win-body">
+            <div class="stat-row">
+              <div class="stat"><b id="st-screen">-</b><span>display</span></div>
+              <div class="stat"><b id="st-link">offline</b><span>remote link</span></div>
+              <div class="stat"><b id="st-ping">-</b><span>latency</span></div>
+              <div class="stat"><b id="st-uptime">0s</b><span>uptime</span></div>
+            </div>
+            <div class="row" style="margin-bottom:12px">
+              <input class="field" id="set-name" data-focus placeholder="Screen name">
+              <button class="btn" id="set-name-save" data-focus>Rename</button>
+            </div>
+            <div class="row" style="margin-bottom:12px">
+              <label class="chip" for="set-wall">wallpaper</label>
+              <select class="field" id="set-wall" data-focus>
+                <option value="assets/wallpaper.jpg">Aurora</option>
+                <option value="gradient-1">Violet</option>
+                <option value="gradient-2">Cyan</option>
+                <option value="gradient-3">Sunset</option>
+                <option value="black">Black</option>
+              </select>
+              <label class="chip" for="set-volume">volume</label>
+              <input class="field" id="set-volume" type="range" min="0" max="100" value="50" data-focus>
+            </div>
+            <div class="row">
+              <button class="btn" id="set-pair" data-focus>Pair phone</button>
+              <button class="btn ghost" id="set-restart" data-focus>Restart CastOS</button>
+            </div>
+          </div>
+        </section>
+      </main>
+
+      <div id="hud" hidden>
+        <div id="hud-bar"><i></i></div>
+        <span id="hud-label">volume 50%</span>
+      </div>
+
+      <div id="toasts"></div>
+      <div id="cursor" hidden></div>
+    </div>
+
+    <section id="pair" hidden>
+      <div class="pair-card">
+        <h1>Pair your phone</h1>
+        <p class="sub" id="pair-sub">Scan this with your phone camera. It opens the remote and connects straight to this screen - no account, no server, works on any network.</p>
+        <div class="qr-wrap"><div id="pair-qr"></div></div>
+        <div class="pair-actions">
+          <button class="btn primary" id="btn-copy-link" data-focus>Copy link</button>
+          <button class="btn" id="btn-new-code" data-focus>New code</button>
+          <button class="btn" id="btn-camera" data-focus>Scan with camera</button>
+          <button class="btn ghost" id="btn-close-pair" data-focus>Close</button>
+        </div>
+        <div class="paste-row">
+          <textarea id="answer-input" data-focus placeholder="Paste the answer code shown on the phone"></textarea>
+          <button class="btn primary" id="btn-answer" data-focus>Connect</button>
+        </div>
+        <div id="pair-status">waiting for phone...</div>
+        <details class="relay">
+          <summary>Local network code (optional, no copy/paste)</summary>
+          <div class="relay-body">
+            <div class="relay-code" id="relay-code">------</div>
+            <p class="relay-note">Type this code on the remote page when both devices are on the same network. Requires the optional <code>python server.py</code>.</p>
+          </div>
+        </details>
+      </div>
+      <video id="scan-video" hidden playsinline></video>
+      <div id="scan-frame" hidden></div>
+      <button class="btn" id="scan-cancel" hidden data-focus>Cancel scan</button>
+    </section>
+  </div>
+
+  <script src="js/qr.js"></script>
+  <script src="js/castos-core.js"></script>
+  <script src="js/castos-link.js"></script>
+  <script src="js/receiver.js"></script>
+</body>
+</html>

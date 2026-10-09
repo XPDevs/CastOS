@@ -1,0 +1,132 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <title>e2e</title>
+</head>
+<body>
+<div id="result">running</div>
+<script src="js/qr.js"></script>
+<script src="js/castos-core.js"></script>
+<script src="js/castos-link.js"></script>
+<script>
+(function () {
+  var log = [];
+  var hostMsgs = [];
+  var guestMsgs = [];
+  var hostOpen = false;
+  var guestOpen = false;
+  var mode = new URLSearchParams(location.search).get("mode") || "manual";
+  var result = document.getElementById("result");
+
+  function flush() {
+    result.textContent = "RESULT " + JSON.stringify({
+      mode: mode,
+      hostOpen: hostOpen,
+      guestOpen: guestOpen,
+      hostMsgs: hostMsgs,
+      guestMsgs: guestMsgs,
+      log: log
+    });
+    result.setAttribute("data-done", "1");
+    if (window.__e2eDone) window.__e2eDone();
+  }
+
+  function timeout(ms) {
+    return new Promise(function (_, reject) {
+      setTimeout(function () { reject(new Error("timeout after " + ms + "ms")); }, ms);
+    });
+  }
+
+  function extractOffer(url) {
+    var hash = url.split("#")[1] || "";
+    var params = {};
+    hash.split("&").forEach(function (p) {
+      if (!p) return;
+      var kv = p.split("=");
+      params[decodeURIComponent(kv[0])] = decodeURIComponent(kv[1] || "");
+    });
+    return params.o;
+  }
+
+  async function runManual() {
+    var host = await CastOS.manualHost({
+      onOpen: function () { hostOpen = true; },
+      onMessage: function (m) { hostMsgs.push(m); }
+    });
+    log.push("host url length " + host.url.length + " blob " + host.blob.length);
+
+    var offer = extractOffer(host.url);
+    if (!offer) throw new Error("no offer extracted from url");
+
+    var guest = await CastOS.manualGuest(offer, {
+      onOpen: function () { guestOpen = true; },
+      onMessage: function (m) { guestMsgs.push(m); }
+    });
+    log.push("guest blob " + guest.blob.length + " hostName " + guest.hostName);
+
+    var answer = guest.blob;
+    await host.finish(answer);
+
+    await Promise.race([
+      new Promise(function (resolve) {
+        var t = setInterval(function () {
+          if (hostOpen && guestOpen) { clearInterval(t); resolve(); }
+        }, 20);
+      }),
+      timeout(15000)
+    ]);
+
+    guest.session.send(CastOS.msg.key("ArrowUp"));
+    guest.session.send(CastOS.msg.cmd("volup"));
+    guest.session.send(CastOS.msg.move(0.25, 0.75));
+    guest.session.send(CastOS.msg.text("hello"));
+    guest.session.send(CastOS.msg.scroll(120));
+    host.session.send(CastOS.msg.ping(4242));
+    host.session.send(CastOS.msg.key("Enter"));
+
+    await new Promise(function (r) { setTimeout(r, 1200); });
+    flush();
+  }
+
+  async function runRelay() {
+    var host = await CastOS.relayHost({
+      onOpen: function () { hostOpen = true; },
+      onMessage: function (m) { hostMsgs.push(m); }
+    });
+    log.push("relay code " + host.code);
+    var guest = await CastOS.relayGuest(host.code, {
+      onOpen: function () { guestOpen = true; },
+      onMessage: function (m) { guestMsgs.push(m); }
+    });
+    await Promise.race([
+      new Promise(function (resolve) {
+        var t = setInterval(function () {
+          if (hostOpen && guestOpen) { clearInterval(t); resolve(); }
+        }, 20);
+      }),
+      timeout(20000)
+    ]);
+    guest.session.send(CastOS.msg.key("ArrowLeft"));
+    guest.session.send(CastOS.msg.click("left"));
+    await new Promise(function (r) { setTimeout(r, 1500); });
+    flush();
+  }
+
+  runManual().catch(function (err) {
+    log.push("ERROR " + (err && err.message ? err.message : String(err)));
+    flush();
+  });
+
+  if (mode === "relay") {
+    runRelay().catch(function (err) {
+      log.push("ERROR " + (err && err.message ? err.message : String(err)));
+      flush();
+    });
+  }
+
+  window.__e2eMode = mode;
+})();
+</script>
+</body>
+</html>
