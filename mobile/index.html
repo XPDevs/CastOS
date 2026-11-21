@@ -21,16 +21,11 @@
     <main class="card">
       <form class="step" id="step-connect">
         <h1>Connect to your screen</h1>
-        <p class="hint">Type the 11-digit code from the top corner of your TV, then choose a pairing password.</p>
+        <p class="hint">Type the 11-digit code from the top corner of your TV.</p>
 
         <label class="field">
           <span>Device code</span>
           <input id="code" inputmode="numeric" autocomplete="one-time-code" maxlength="11" placeholder="12345678901">
-        </label>
-
-        <label class="field">
-          <span>Pairing password</span>
-          <input id="password" type="password" inputmode="numeric" maxlength="8" placeholder="4+ digits">
         </label>
 
         <button class="button" id="connect" type="submit">Connect</button>
@@ -39,12 +34,13 @@
 
       <form class="step" id="step-verify" hidden>
         <h1>Verify this phone</h1>
-        <p class="hint">Your TV is showing a 4-digit password. Enter it here to finish pairing.</p>
+        <p class="hint">Your TV is showing a password. Type it here to pair.</p>
 
         <input class="pin" id="challenge" inputmode="numeric" maxlength="4" autocomplete="off" placeholder="0000">
 
         <button class="button" id="verify" type="submit">Pair</button>
         <p class="error" id="error-verify" role="alert"></p>
+        <button class="button button--ghost" id="start-over" type="button">Start over</button>
       </form>
 
       <section class="step" id="step-paired" hidden>
@@ -57,6 +53,8 @@
         </form>
 
         <ul class="sent" id="sent"></ul>
+
+        <button class="button button--ghost" id="reset" type="button">Disconnect</button>
       </section>
     </main>
 

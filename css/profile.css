@@ -1,0 +1,35 @@
+/*
+ * Lite profile — cheaper paint and shorter transitions for low-memory or slow
+ * hardware (Raspberry Pi, old laptops). Set by js/device.js.
+ */
+
+[data-profile="lite"] .cast {
+  background: rgba(12, 14, 20, 0.8);
+  -webkit-backdrop-filter: none;
+  backdrop-filter: none;
+  box-shadow: none;
+  transform: none;
+  transition: opacity 200ms linear;
+}
+
+[data-profile="lite"] .cast-panel {
+  background: rgba(4, 6, 12, 0.85);
+  -webkit-backdrop-filter: none;
+  backdrop-filter: none;
+  transition-duration: 180ms;
+}
+
+[data-profile="lite"] .cast-card {
+  background: #14161d;
+  box-shadow: none;
+  transform: none;
+  transition: none;
+}
+
+[data-profile="lite"] .clock {
+  text-shadow: none;
+}
+
+[data-profile="lite"] .slide {
+  will-change: auto;
+}

@@ -1,19 +1,20 @@
-/* Cast badge, pairing panel and message panel. */
+/* Cast badge, pairing card and message card. */
 
 .cast {
   position: fixed;
-  top: 3.2vh;
-  right: 3.4vh;
+  top: 3.4vh;
+  right: 7vh;
   z-index: 3;
   display: flex;
   align-items: center;
-  gap: 1.1vh;
-  padding: 0.9vh 2vh 0.9vh 1.5vh;
-  border: 1px solid rgba(255, 255, 255, 0.14);
+  gap: 1.2vh;
+  padding: 1vh 2.3vh 1vh 1.7vh;
+  border: 1px solid rgba(255, 255, 255, 0.13);
   border-radius: 999px;
-  background: rgba(10, 12, 18, 0.4);
-  -webkit-backdrop-filter: blur(14px);
-  backdrop-filter: blur(14px);
+  background: rgba(12, 14, 20, 0.46);
+  box-shadow: 0 0.6vh 2.6vh rgba(0, 0, 0, 0.32);
+  -webkit-backdrop-filter: blur(16px) saturate(120%);
+  backdrop-filter: blur(16px) saturate(120%);
   color: #fff;
   font-family: "Google Sans Flex", "Helvetica Neue", Arial, sans-serif;
   opacity: 0;
@@ -32,7 +33,7 @@
 .cast__icon {
   width: 2.5vh;
   height: 2.5vh;
-  color: rgba(255, 255, 255, 0.88);
+  color: rgba(255, 255, 255, 0.86);
   transition: color 500ms ease;
 }
 
@@ -41,14 +42,14 @@
 }
 
 .cast__code {
-  font-size: 2.1vh;
+  font-size: 2vh;
   font-weight: 400;
-  letter-spacing: 0.2em;
+  letter-spacing: 0.18em;
   font-variant-numeric: tabular-nums;
   white-space: nowrap;
 }
 
-/* Panel used for pairing, messages and short status cards. */
+/* Centred card used for pairing, messages and short status cards. */
 
 .cast-panel {
   position: fixed;
@@ -58,19 +59,17 @@
   bottom: 0;
   z-index: 4;
   display: flex;
-  flex-direction: column;
   align-items: center;
   justify-content: center;
-  gap: 2vh;
   padding: 6vh 8vw;
-  background: rgba(4, 6, 12, 0.55);
-  -webkit-backdrop-filter: blur(20px);
-  backdrop-filter: blur(20px);
+  background: rgba(4, 6, 12, 0.58);
+  -webkit-backdrop-filter: blur(22px);
+  backdrop-filter: blur(22px);
   color: #fff;
   font-family: "Google Sans Flex", "Helvetica Neue", Arial, sans-serif;
   text-align: center;
   opacity: 0;
-  transition: opacity 450ms ease;
+  transition: opacity 420ms ease;
   pointer-events: none;
   user-select: none;
   -webkit-user-select: none;
@@ -84,19 +83,45 @@
   opacity: 1;
 }
 
+.cast-card {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  gap: 2vh;
+  max-width: 78vw;
+  padding: 5.4vh 6vw 5vh;
+  border: 1px solid rgba(255, 255, 255, 0.1);
+  border-radius: 3.4vh;
+  background: rgba(17, 19, 26, 0.9);
+  box-shadow: 0 3vh 9vh rgba(0, 0, 0, 0.55);
+  transform: translateY(1.4vh) scale(0.985);
+  transition: transform 480ms cubic-bezier(0.2, 0.8, 0.2, 1);
+}
+
+.cast-panel.is-visible .cast-card {
+  transform: none;
+}
+
+.cast-card__icon {
+  width: 4.4vh;
+  height: 4.4vh;
+  color: #8ab4f8;
+  opacity: 0.92;
+}
+
 .cast-panel__eyebrow {
-  font-size: 1.9vh;
+  font-size: 1.8vh;
   font-weight: 400;
   letter-spacing: 0.3em;
   text-transform: uppercase;
-  opacity: 0.65;
+  opacity: 0.62;
 }
 
 .cast-panel__headline {
-  max-width: 72vw;
-  font-size: 6.4vh;
+  max-width: 62vw;
+  font-size: 5.2vh;
   font-weight: 400;
-  line-height: 1.18;
+  line-height: 1.2;
   letter-spacing: -0.01em;
   overflow-wrap: anywhere;
 }
@@ -106,18 +131,18 @@
 }
 
 .cast-panel__headline.is-code {
-  font-size: 13vh;
+  font-size: 12vh;
   font-variant-numeric: tabular-nums;
-  letter-spacing: 0.32em;
-  padding-left: 0.32em;
+  letter-spacing: 0.3em;
+  padding-left: 0.3em;
 }
 
 .cast-panel__sub {
-  max-width: 58vw;
-  font-size: 2.5vh;
+  max-width: 52vw;
+  font-size: 2.4vh;
   font-weight: 300;
-  line-height: 1.35;
-  opacity: 0.82;
+  line-height: 1.4;
+  opacity: 0.8;
 }
 
 .cast-panel__sub:empty {

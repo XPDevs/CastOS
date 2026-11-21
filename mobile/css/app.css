@@ -233,6 +233,14 @@ input:focus {
   padding: 15px 22px;
 }
 
+.button--ghost {
+  padding: 13px;
+  border: 1px solid var(--line);
+  background: transparent;
+  color: var(--muted);
+  font-size: 15px;
+}
+
 .sent {
   display: flex;
   flex-direction: column;

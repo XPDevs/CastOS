@@ -1,9 +1,9 @@
 /*
  * CastOS Connect — pairs a phone with a CastOS screen over ntfy.sh.
  *
- * 1. Type the screen's 11-digit code and choose a pairing password.
- * 2. The screen shows a 4-digit password; type it here to pair.
- * 3. Send messages to the screen.
+ * 1. Type the screen's 11-digit device code.
+ * 2. The screen shows a password of its own; type it here to pair.
+ * 3. Send messages to the screen with the session token it hands back.
  */
 (function (global) {
   "use strict";
@@ -19,7 +19,6 @@
     stepVerify: document.getElementById("step-verify"),
     stepPaired: document.getElementById("step-paired"),
     code: document.getElementById("code"),
-    password: document.getElementById("password"),
     connect: document.getElementById("connect"),
     error: document.getElementById("error"),
     challenge: document.getElementById("challenge"),
@@ -33,8 +32,8 @@
 
   var state = {
     code: "",
-    password: "",
     session: "",
+    token: "",
     socket: null,
     timer: 0,
     step: "connect"
@@ -84,8 +83,8 @@
       from: "phone",
       type: payload.type,
       session: state.session,
-      password: payload.password || "",
       challenge: payload.challenge || "",
+      token: state.token,
       text: payload.text || "",
       at: Date.now()
     };
@@ -159,7 +158,7 @@
   function sendPair() {
     startTimer();
 
-    publish({ type: "pair", password: state.password }).catch(function () {
+    publish({ type: "pair" }).catch(function () {
       stopConnecting("Could not reach the screen. Check your connection and try again.");
     });
   }
@@ -186,7 +185,7 @@
     if (message.session !== state.session) return;
 
     if (message.type === "challenge") onChallenge();
-    else if (message.type === "paired") onPaired();
+    else if (message.type === "paired") onPaired(message);
     else if (message.type === "denied") onDenied();
     else if (message.type === "cancel") onCancel();
   }
@@ -200,9 +199,12 @@
     els.challenge.focus();
   }
 
-  function onPaired() {
+  function onPaired(message) {
+    if (!message.token) return;
+
     global.clearTimeout(state.timer);
     closeSocket();
+    state.token = String(message.token);
     els.pairedTo.textContent = "This phone is connected to screen " + groupCode(state.code) + ".";
     show("paired");
     els.message.focus();
@@ -225,26 +227,18 @@
 
   function connect(event) {
     var code;
-    var password;
 
     if (event) event.preventDefault();
 
     code = digits(els.code.value);
-    password = digits(els.password.value);
 
     if (code.length !== 11) {
       fail(els.error, "Enter the 11-digit code shown on your screen.");
       return;
     }
 
-    if (password.length < 4) {
-      fail(els.error, "Choose a pairing password of at least 4 digits.");
-      return;
-    }
-
     fail(els.error, "");
     state.code = code;
-    state.password = password;
     state.session = randomId();
     els.connect.disabled = true;
     els.connect.textContent = "Connecting…";
@@ -273,6 +267,31 @@
     });
   }
 
+  /* Reset returns the phone to the connect screen and, when paired, tells the
+     screen to forget this phone. */
+  function reset() {
+    if (state.token) {
+      publish({ type: "unpair" }).catch(function () {});
+    }
+
+    global.clearTimeout(state.timer);
+    closeSocket();
+
+    state.session = "";
+    state.token = "";
+    els.code.value = "";
+    els.challenge.value = "";
+    els.message.value = "";
+    els.sent.innerHTML = "";
+    els.connect.disabled = false;
+    els.connect.textContent = "Connect";
+    fail(els.error, "");
+    fail(els.errorVerify, "");
+
+    show("connect");
+    els.code.focus();
+  }
+
   function appendBubble(text, isError) {
     var item = document.createElement("li");
 
@@ -294,25 +313,28 @@
     els.message.value = "";
     appendBubble(text);
 
-    publish({ type: "message", text: text.slice(0, 280), password: state.password }).catch(function () {
+    publish({ type: "message", text: text.slice(0, 280) }).catch(function () {
       appendBubble("Not sent — check your connection.", true);
     });
   }
 
   function onlyDigits(input) {
     input.addEventListener("input", function () {
-      var cleaned = digits(input.value).slice(0, input.maxLength > 0 ? input.maxLength : 32);
+      var limit = input.maxLength > 0 ? input.maxLength : 32;
+      var cleaned = digits(input.value).slice(0, limit);
+
       if (input.value !== cleaned) input.value = cleaned;
     });
   }
 
   onlyDigits(els.code);
-  onlyDigits(els.password);
   onlyDigits(els.challenge);
 
   els.stepConnect.addEventListener("submit", connect);
   els.stepVerify.addEventListener("submit", verify);
   els.composer.addEventListener("submit", send);
+  document.getElementById("start-over").addEventListener("click", reset);
+  document.getElementById("reset").addEventListener("click", reset);
 
   show("connect");
 })(window);

@@ -1,11 +1,13 @@
 /*
  * Cast — the Chromecast-style badge, pairing flow and message panel.
  *
- * The 11-digit code shown on screen is also the ntfy.sh topic. A phone sends
- * a pairing request carrying its own password; this screen answers with a
- * 4-digit password the phone has to repeat, and only then pairs. Paired
- * messages are shown in a panel and dismissed on their own: the TV has no
- * mouse or keyboard controls.
+ * The 11-digit device code is generated once, kept across reloads and used
+ * as the ntfy.sh topic. A phone that knows the code asks to pair; this screen
+ * invents a 4-digit pairing code and shows it. Only a phone that types that
+ * code back is paired, and it then receives a session token that every later
+ * message must carry.
+ *
+ * Everything runs on its own: there are no mouse or keyboard controls.
  *
  * Exposes window.Ambient.Cast.
  */
@@ -15,6 +17,7 @@
   var HTTP = "https://ntfy.sh/";
   var WS = "wss://ntfy.sh/";
   var APP = "castos";
+  var CODE_KEY = "castos.device-code";
   var CODE_LENGTH = 11;
   var CHALLENGE_MS = 60000;
   var MESSAGE_MS = 12000;
@@ -37,6 +40,24 @@
     return digits;
   }
 
+  function randomToken() {
+    var token = "";
+    var values;
+    var i;
+
+    if (global.crypto && global.crypto.getRandomValues) {
+      values = new Uint8Array(16);
+      global.crypto.getRandomValues(values);
+      for (i = 0; i < values.length; i++) {
+        token += (values[i] < 16 ? "0" : "") + values[i].toString(16);
+      }
+      return token;
+    }
+
+    for (i = 0; i < 32; i++) token += Math.floor(Math.random() * 16).toString(16);
+    return token;
+  }
+
   function groupCode(code) {
     return code.slice(0, 3) + " " + code.slice(3, 7) + " " + code.slice(7);
   }
@@ -45,12 +66,38 @@
     return value.split("").join(" ");
   }
 
+  function storedCode() {
+    try {
+      var code = global.localStorage.getItem(CODE_KEY);
+      return code && /^\d{11}$/.test(code) ? code : "";
+    } catch (error) {
+      return "";
+    }
+  }
+
+  function saveCode(code) {
+    try {
+      global.localStorage.setItem(CODE_KEY, code);
+    } catch (error) {}
+  }
+
+  /* The device code stays the same across reloads, so the topic does too. */
+  function deviceCode() {
+    var code = storedCode();
+
+    if (code) return code;
+
+    code = randomDigits(CODE_LENGTH);
+    saveCode(code);
+    return code;
+  }
+
   function Cast(els) {
     this.els = els;
-    this.code = randomDigits(CODE_LENGTH);
+    this.code = deviceCode();
     this.topic = this.code;
     this.session = "";
-    this.password = "";
+    this.token = "";
     this.pending = null;
     this.paired = false;
     this.socket = null;
@@ -124,17 +171,18 @@
     if (message.type === "pair") this.requestPair(message);
     else if (message.type === "verify") this.verify(message);
     else if (message.type === "message") this.showMessage(message);
+    else if (message.type === "unpair") this.unpair(message);
   };
 
+  /* The screen invents the pairing code; the phone only has to read it. */
   Cast.prototype.requestPair = function (message) {
     var self = this;
     var session;
 
-    if (!message.session || !message.password) return;
+    if (!message.session) return;
 
     this.pending = {
       session: String(message.session),
-      password: String(message.password),
       challenge: randomDigits(4)
     };
 
@@ -143,7 +191,7 @@
     this.showPanel(
       "Pairing request",
       spaceDigits(this.pending.challenge),
-      "Enter this password on your phone to connect",
+      "Type this password on your phone to connect",
       true
     );
 
@@ -169,18 +217,18 @@
       this.challengeTimer = 0;
       this.pending = null;
       this.session = pending.session;
-      this.password = pending.password;
+      this.token = randomToken();
       this.paired = true;
 
       this.els.badge.classList.add("is-paired");
       this.showPanel("Connected", "This phone can send messages here", "", false, TOAST_MS);
-      this.publish({ type: "paired", session: this.session });
+      this.publish({ type: "paired", session: this.session, token: this.token });
     } else {
       this.publish({ type: "denied", session: pending.session });
       this.showPanel(
         "Pairing failed",
-        "The password did not match",
-        "Check the password shown on this screen",
+        "That password did not match",
+        "Use the password shown on this screen",
         false,
         TOAST_MS
       );
@@ -191,9 +239,25 @@
     var text = typeof message.text === "string" ? message.text.trim() : "";
 
     if (!this.paired || String(message.session) !== this.session) return;
-    if (String(message.password) !== this.password || !text) return;
+    if (!this.token || String(message.token) !== this.token || !text) return;
 
     this.showPanel("Message from your phone", text.slice(0, 280), "", false, MESSAGE_MS);
+  };
+
+  /* The phone's reset clears the pairing here too, so the next phone starts
+     from a clean screen. */
+  Cast.prototype.unpair = function (message) {
+    if (!this.paired || !this.token) return;
+    if (String(message.session) !== this.session) return;
+    if (String(message.token) !== this.token) return;
+
+    this.paired = false;
+    this.session = "";
+    this.token = "";
+    this.pending = null;
+
+    this.els.badge.classList.remove("is-paired");
+    this.showPanel("Disconnected", "This phone is no longer connected", "", false, TOAST_MS);
   };
 
   Cast.prototype.publish = function (payload) {
@@ -203,6 +267,7 @@
       from: "tv",
       type: payload.type,
       session: payload.session || "",
+      token: payload.token || "",
       at: Date.now()
     };
 
