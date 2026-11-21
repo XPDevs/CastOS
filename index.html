@@ -10,6 +10,7 @@
   <link rel="stylesheet" href="css/clock.css">
   <link rel="stylesheet" href="css/slideshow.css">
   <link rel="stylesheet" href="css/cast.css">
+  <link rel="stylesheet" href="css/player.css">
   <link rel="stylesheet" href="css/profile.css">
 </head>
 <body>
@@ -41,9 +42,22 @@
     </div>
   </div>
 
+  <div class="player" id="player" aria-hidden="true" hidden>
+    <video class="player__video" id="player-video" playsinline preload="auto" hidden></video>
+    <div class="player__frame" id="player-frame" hidden></div>
+    <div class="player__loading" id="player-loading">
+      <div class="player__spinner" aria-hidden="true"></div>
+      <div class="player__title" id="player-title">Loading</div>
+      <div class="player__status" id="player-status"></div>
+      <div class="player__bar" id="player-bar"><div class="player__fill" id="player-fill"></div></div>
+      <div class="player__note" id="player-note"></div>
+    </div>
+  </div>
+
   <script src="js/playlist.js"></script>
   <script src="js/clock.js"></script>
   <script src="js/slideshow.js"></script>
+  <script src="js/player.js"></script>
   <script src="js/cast.js"></script>
   <script src="js/main.js"></script>
 </body>

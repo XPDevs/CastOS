@@ -25,6 +25,18 @@
 
   document.documentElement.style.setProperty("--fade", CROSSFADE_MS + "ms");
 
+  var player = new window.Ambient.Player({
+    overlay: document.getElementById("player"),
+    video: document.getElementById("player-video"),
+    frame: document.getElementById("player-frame"),
+    loading: document.getElementById("player-loading"),
+    title: document.getElementById("player-title"),
+    status: document.getElementById("player-status"),
+    fill: document.getElementById("player-fill"),
+    bar: document.getElementById("player-bar"),
+    note: document.getElementById("player-note")
+  });
+
   function startCast() {
     if (!window.Ambient.Cast) return;
 
@@ -34,7 +46,8 @@
       panel: document.getElementById("cast-panel"),
       eyebrow: document.getElementById("cast-panel-eyebrow"),
       headline: document.getElementById("cast-panel-headline"),
-      sub: document.getElementById("cast-panel-sub")
+      sub: document.getElementById("cast-panel-sub"),
+      player: player
     }).start();
   }
 

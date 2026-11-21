@@ -86,6 +86,7 @@
       challenge: payload.challenge || "",
       token: state.token,
       text: payload.text || "",
+      url: payload.url || "",
       at: Date.now()
     };
 
@@ -302,18 +303,45 @@
     while (els.sent.children.length > 6) els.sent.removeChild(els.sent.firstChild);
   }
 
+  /* "hi" is a message; "youtube.com/watch?v=…" or "https://…/clip.mp4" is
+     a link. Bare domains get https:// so phoned-in links still work. */
+  function asLink(text) {
+    var candidate = text;
+    var url;
+
+    if (!/^https?:\/\//i.test(candidate)) {
+      if (!/^[\w-]+(\.[\w-]+)+(\/\S*)?$/.test(candidate)) return "";
+      candidate = "https://" + candidate;
+    }
+
+    try {
+      url = new URL(candidate);
+    } catch (error) {
+      return "";
+    }
+
+    return url.protocol === "http:" || url.protocol === "https:" ? url.href : "";
+  }
+
   function send(event) {
     var text;
+    var link;
 
     if (event) event.preventDefault();
 
     text = els.message.value.trim();
     if (!text) return;
 
+    link = asLink(text);
+
     els.message.value = "";
     appendBubble(text);
 
-    publish({ type: "message", text: text.slice(0, 280) }).catch(function () {
+    publish(
+      link
+        ? { type: "media", url: link }
+        : { type: "message", text: text.slice(0, 280) }
+    ).catch(function () {
       appendBubble("Not sent — check your connection.", true);
     });
   }

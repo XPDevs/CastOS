@@ -94,6 +94,7 @@
 
   function Cast(els) {
     this.els = els;
+    this.player = els.player || null;
     this.code = deviceCode();
     this.topic = this.code;
     this.session = "";
@@ -171,6 +172,7 @@
     if (message.type === "pair") this.requestPair(message);
     else if (message.type === "verify") this.verify(message);
     else if (message.type === "message") this.showMessage(message);
+    else if (message.type === "media") this.playMedia(message);
     else if (message.type === "unpair") this.unpair(message);
   };
 
@@ -242,6 +244,22 @@
     if (!this.token || String(message.token) !== this.token || !text) return;
 
     this.showPanel("Message from your phone", text.slice(0, 280), "", false, MESSAGE_MS);
+  };
+
+  Cast.prototype.playMedia = function (message) {
+    if (!this.paired || String(message.session) !== this.session) return;
+    if (!this.token || String(message.token) !== this.token) return;
+    if (!this.player || typeof message.url !== "string") return;
+
+    if (!this.player.open(message.url)) {
+      this.showPanel(
+        "Can't open that link",
+        "Send a YouTube or direct video URL",
+        "",
+        false,
+        TOAST_MS
+      );
+    }
   };
 
   /* The phone's reset clears the pairing here too, so the next phone starts
