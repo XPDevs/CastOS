@@ -241,6 +241,125 @@ input:focus {
   font-size: 15px;
 }
 
+/* Playback controller */
+
+.controller {
+  display: flex;
+  flex-direction: column;
+  gap: 12px;
+  padding: 16px;
+  border: 1px solid var(--line);
+  border-radius: 18px;
+  background: #151821;
+}
+
+.controller[hidden] {
+  display: none;
+}
+
+.controller__head {
+  display: flex;
+  justify-content: space-between;
+  color: var(--muted);
+  font-size: 11px;
+  letter-spacing: 0.12em;
+  text-transform: uppercase;
+}
+
+.controller__title {
+  margin: 0;
+  font-size: 16px;
+  line-height: 1.35;
+  overflow-wrap: anywhere;
+}
+
+.controller__seek {
+  width: 100%;
+  padding: 0;
+  border: 0;
+  background: transparent;
+  accent-color: var(--accent);
+  -webkit-appearance: auto;
+}
+
+.controller__times {
+  display: flex;
+  justify-content: space-between;
+  color: var(--muted);
+  font-size: 12px;
+  font-variant-numeric: tabular-nums;
+}
+
+.controller__buttons {
+  display: flex;
+  justify-content: center;
+  gap: 12px;
+  padding-top: 2px;
+}
+
+.round {
+  display: grid;
+  place-items: center;
+  width: 50px;
+  height: 50px;
+  border: 0;
+  border-radius: 50%;
+  background: var(--accent);
+  color: #0b0d12;
+  cursor: pointer;
+}
+
+.round--ghost {
+  border: 1px solid var(--line);
+  background: transparent;
+  color: var(--text);
+}
+
+.round:active {
+  transform: scale(0.96);
+}
+
+/* Apps */
+
+.apps {
+  display: flex;
+  flex-direction: column;
+  gap: 10px;
+  padding-top: 4px;
+  border-top: 1px solid var(--line);
+}
+
+.apps__label {
+  margin: 10px 0 0;
+  color: var(--muted);
+  font-size: 11px;
+  letter-spacing: 0.14em;
+  text-transform: uppercase;
+}
+
+.apps__grid {
+  display: grid;
+  grid-template-columns: repeat(3, 1fr);
+  gap: 8px;
+}
+
+.app {
+  padding: 14px 8px;
+  border: 1px solid var(--line);
+  border-radius: 14px;
+  background: #171a22;
+  color: var(--text);
+  font-family: inherit;
+  font-size: 13px;
+  line-height: 1.25;
+  cursor: pointer;
+}
+
+.app:active {
+  transform: scale(0.98);
+  border-color: rgba(138, 180, 248, 0.6);
+}
+
 .sent {
   display: flex;
   flex-direction: column;

@@ -47,12 +47,39 @@
         <h1>Connected</h1>
         <p class="hint" id="paired-to"></p>
 
+        <section class="controller" id="controller" hidden>
+          <div class="controller__head">
+            <span>Now playing</span>
+            <span id="controller-state">Playing</span>
+          </div>
+          <p class="controller__title" id="controller-title"></p>
+          <input class="controller__seek" id="seek" type="range" min="0" max="100" step="0.1" value="0" aria-label="Seek">
+          <div class="controller__times">
+            <span id="position">0:00</span>
+            <span id="duration">0:00</span>
+          </div>
+          <div class="controller__buttons">
+            <button class="round" id="control-toggle" type="button" aria-label="Pause"></button>
+            <button class="round round--ghost" id="control-stop" type="button" aria-label="Stop"></button>
+          </div>
+        </section>
+
         <form class="composer" id="composer">
           <input id="message" maxlength="600" autocomplete="off" placeholder="Paste a YouTube or video link">
           <button class="button button--send" type="submit">Send</button>
         </form>
 
         <p class="hint">Links play full screen. Anything else appears as a message.</p>
+
+        <div class="apps">
+          <p class="apps__label">Apps</p>
+          <div class="apps__grid">
+            <button class="app" type="button" data-app="youtube">YouTube</button>
+            <button class="app" type="button" data-app="youtube-music">YouTube Music</button>
+            <button class="app" type="button" data-app="twitch">Twitch</button>
+          </div>
+          <p class="hint">Opens the app on your TV in full screen.</p>
+        </div>
 
         <ul class="sent" id="sent"></ul>
 

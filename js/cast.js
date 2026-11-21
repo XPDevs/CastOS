@@ -24,6 +24,13 @@
   var TOAST_MS = 4500;
   var RETRY_MS = 3000;
 
+  /* Apps the phone may launch on this screen. Only these URLs are allowed. */
+  var APPS = {
+    youtube: "https://www.youtube.com/tv",
+    "youtube-music": "https://music.youtube.com/",
+    twitch: "https://www.twitch.tv/"
+  };
+
   function randomDigits(count) {
     var digits = "";
     var values;
@@ -108,9 +115,17 @@
   }
 
   Cast.prototype.start = function () {
+    var self = this;
+
     this.els.code.textContent = groupCode(this.code);
     this.els.badge.classList.add("is-visible");
     this.connect();
+
+    if (this.player) {
+      this.player.onUpdate = function (update) {
+        self.publishPlayback(update);
+      };
+    }
   };
 
   Cast.prototype.connect = function () {
@@ -173,6 +188,8 @@
     else if (message.type === "verify") this.verify(message);
     else if (message.type === "message") this.showMessage(message);
     else if (message.type === "media") this.playMedia(message);
+    else if (message.type === "control") this.control(message);
+    else if (message.type === "app") this.launchApp(message);
     else if (message.type === "unpair") this.unpair(message);
   };
 
@@ -262,6 +279,53 @@
     }
   };
 
+  /* Playback controls come from the paired phone only. */
+  Cast.prototype.control = function (message) {
+    var action = String(message.action || "");
+
+    if (!this.authorised(message) || !this.player) return;
+
+    if (action === "pause") this.player.pause();
+    else if (action === "play") this.player.play();
+    else if (action === "stop") this.player.stop();
+    else if (action === "seek") this.player.seek(Number(message.position));
+    else if (action === "status") this.publishPlayback(this.player.status());
+  };
+
+  Cast.prototype.launchApp = function (message) {
+    var url = APPS[String(message.appId || "")];
+    var self = this;
+
+    if (!this.authorised(message) || !url) return;
+
+    this.showPanel("Opening", "Starting the app on this screen", "", false, TOAST_MS);
+
+    global.setTimeout(function () {
+      global.location.href = url;
+    }, 700);
+  };
+
+  Cast.prototype.authorised = function (message) {
+    if (!this.paired || !this.token) return false;
+    if (String(message.session) !== this.session) return false;
+
+    return String(message.token) === this.token;
+  };
+
+  Cast.prototype.publishPlayback = function (update) {
+    if (!this.paired || !this.token) return;
+
+    this.publish({
+      type: "playback",
+      session: this.session,
+      token: this.token,
+      state: update.state,
+      position: update.position,
+      duration: update.duration,
+      title: update.title
+    });
+  };
+
   /* The phone's reset clears the pairing here too, so the next phone starts
      from a clean screen. */
   Cast.prototype.unpair = function (message) {
@@ -286,6 +350,10 @@
       type: payload.type,
       session: payload.session || "",
       token: payload.token || "",
+      state: payload.state || "",
+      position: payload.position || 0,
+      duration: payload.duration || 0,
+      title: payload.title || "",
       at: Date.now()
     };
 

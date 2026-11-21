@@ -67,4 +67,19 @@
   }
 
   startCast();
+
+  /* Browsers only allow audio after a gesture. This adds no controls: the
+     first tap or key press anywhere on the screen lifts the mute. A kiosk
+     launched with tools/kiosk.sh never needs it. */
+  var unlocked = false;
+
+  function unlockAudio() {
+    if (unlocked) return;
+    unlocked = true;
+    player.unlockAudio();
+  }
+
+  ["pointerdown", "keydown", "touchstart"].forEach(function (type) {
+    document.addEventListener(type, unlockAudio, { passive: true });
+  });
 })();

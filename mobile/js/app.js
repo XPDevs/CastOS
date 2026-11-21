@@ -3,7 +3,7 @@
  *
  * 1. Type the screen's 11-digit device code.
  * 2. The screen shows a password of its own; type it here to pair.
- * 3. Send messages to the screen with the session token it hands back.
+ * 3. Send links, control playback and open apps.
  */
 (function (global) {
   "use strict";
@@ -12,6 +12,20 @@
   var WS = "wss://ntfy.sh/";
   var APP = "castos";
   var WAIT_MS = 25000;
+
+  var ICON_PLAY = '<svg viewBox="0 0 24 24" width="20" height="20" aria-hidden="true"><path fill="currentColor" d="M8 5l11 7-11 7z"/></svg>';
+  var ICON_PAUSE = '<svg viewBox="0 0 24 24" width="20" height="20" aria-hidden="true"><path fill="currentColor" d="M6 5h4v14H6zM14 5h4v14h-4z"/></svg>';
+  var ICON_STOP = '<svg viewBox="0 0 24 24" width="18" height="18" aria-hidden="true"><path fill="currentColor" d="M6 6h12v12H6z"/></svg>';
+
+  var STATE_LABELS = {
+    playing: "Playing",
+    paused: "Paused",
+    buffering: "Buffering",
+    loading: "Loading",
+    ended: "Ended",
+    error: "Can't play",
+    closed: "Stopped"
+  };
 
   var els = {
     tag: document.getElementById("topbar-tag"),
@@ -25,6 +39,14 @@
     verify: document.getElementById("verify"),
     errorVerify: document.getElementById("error-verify"),
     pairedTo: document.getElementById("paired-to"),
+    controller: document.getElementById("controller"),
+    controllerTitle: document.getElementById("controller-title"),
+    controllerState: document.getElementById("controller-state"),
+    seek: document.getElementById("seek"),
+    position: document.getElementById("position"),
+    duration: document.getElementById("duration"),
+    toggle: document.getElementById("control-toggle"),
+    stop: document.getElementById("control-stop"),
     composer: document.getElementById("composer"),
     message: document.getElementById("message"),
     sent: document.getElementById("sent")
@@ -37,6 +59,16 @@
     socket: null,
     timer: 0,
     step: "connect"
+  };
+
+  var media = {
+    active: false,
+    state: "",
+    position: 0,
+    duration: 0,
+    title: "",
+    stamp: 0,
+    seeking: false
   };
 
   function digits(value) {
@@ -64,6 +96,19 @@
     return Date.now().toString(36) + Math.floor(Math.random() * 1e6).toString(36);
   }
 
+  function clock(seconds) {
+    var total = Math.max(0, Math.floor(Number(seconds) || 0));
+    var hours = Math.floor(total / 3600);
+    var minutes = Math.floor((total % 3600) / 60);
+    var secs = total % 60;
+    var pad = function (value) {
+      return value < 10 ? "0" + value : String(value);
+    };
+
+    if (hours) return hours + ":" + pad(minutes) + ":" + pad(secs);
+    return minutes + ":" + pad(secs);
+  }
+
   function show(step) {
     state.step = step;
     els.stepConnect.hidden = step !== "connect";
@@ -87,6 +132,9 @@
       token: state.token,
       text: payload.text || "",
       url: payload.url || "",
+      action: payload.action || "",
+      appId: payload.app || "",
+      position: payload.position || 0,
       at: Date.now()
     };
 
@@ -110,7 +158,9 @@
     state.socket = null;
   }
 
-  function openSocket() {
+  /* The socket stays open after pairing: playback state arrives on it. A
+     dropped socket is reopened without sending a new pairing request. */
+  function openSocket(rejoin) {
     var socket;
 
     closeSocket();
@@ -125,7 +175,7 @@
     state.socket = socket;
 
     socket.onopen = function () {
-      sendPair();
+      if (!rejoin) sendPair();
     };
 
     socket.onmessage = function (event) {
@@ -135,8 +185,16 @@
     socket.onerror = function () {};
 
     socket.onclose = function () {
-      if (state.step !== "connect") return;
-      stopConnecting("Lost the connection to that screen. Try again.");
+      if (state.step === "connect") {
+        stopConnecting("Lost the connection to that screen. Try again.");
+        return;
+      }
+
+      if (state.step !== "paired") return;
+
+      global.setTimeout(function () {
+        if (state.step === "paired" && !state.socket) openSocket(true);
+      }, 2000);
     };
   }
 
@@ -189,6 +247,7 @@
     else if (message.type === "paired") onPaired(message);
     else if (message.type === "denied") onDenied();
     else if (message.type === "cancel") onCancel();
+    else if (message.type === "playback") onPlayback(message);
   }
 
   function onChallenge() {
@@ -204,11 +263,13 @@
     if (!message.token) return;
 
     global.clearTimeout(state.timer);
-    closeSocket();
     state.token = String(message.token);
     els.pairedTo.textContent = "This phone is connected to screen " + groupCode(state.code) + ".";
     show("paired");
     els.message.focus();
+
+    /* Ask what is already on screen so the controller starts in sync. */
+    publish({ type: "control", action: "status" }).catch(function () {});
   }
 
   function onDenied() {
@@ -225,6 +286,79 @@
     show("connect");
     fail(els.error, "The screen cancelled the pairing. Try again.");
   }
+
+  /* ---- playback controller ---- */
+
+  function currentPosition() {
+    if (media.state === "playing" && media.stamp) {
+      return Math.min(media.duration || Infinity, media.position + (Date.now() - media.stamp) / 1000);
+    }
+
+    return media.position;
+  }
+
+  function renderMedia() {
+    var position;
+
+    els.controller.hidden = !media.active;
+    if (!media.active) return;
+
+    position = currentPosition();
+
+    els.controllerTitle.textContent = media.title || "Media";
+    els.controllerState.textContent = STATE_LABELS[media.state] || "Ready";
+    els.toggle.innerHTML = media.state === "playing" ? ICON_PAUSE : ICON_PLAY;
+    els.toggle.setAttribute("aria-label", media.state === "playing" ? "Pause" : "Play");
+
+    els.seek.max = String(Math.max(media.duration, 1));
+    if (!media.seeking) els.seek.value = String(position);
+    els.position.textContent = clock(position);
+    els.duration.textContent = clock(media.duration);
+  }
+
+  function onPlayback(message) {
+    media.state = String(message.state || "");
+    media.title = String(message.title || "") || media.title;
+    media.position = Number(message.position) || 0;
+    media.duration = Number(message.duration) || 0;
+    media.stamp = Date.now();
+    media.active = media.state !== "closed" && media.state !== "ended";
+
+    if (!media.active) media.position = 0;
+
+    renderMedia();
+  }
+
+  function togglePlayback() {
+    if (!media.active) return;
+
+    publish({
+      type: "control",
+      action: media.state === "playing" ? "pause" : "play"
+    }).catch(function () {
+      appendBubble("Control didn't reach the screen.", true);
+    });
+  }
+
+  function stopPlayback() {
+    if (!media.active) return;
+
+    publish({ type: "control", action: "stop" }).catch(function () {});
+    media.active = false;
+    renderMedia();
+  }
+
+  global.setInterval(function () {
+    var position;
+
+    if (!media.active) return;
+
+    position = currentPosition();
+    if (!media.seeking) els.seek.value = String(Math.min(position, Number(els.seek.max)));
+    els.position.textContent = clock(position);
+  }, 1000);
+
+  /* ---- pairing ---- */
 
   function connect(event) {
     var code;
@@ -280,6 +414,7 @@
 
     state.session = "";
     state.token = "";
+    media.active = false;
     els.code.value = "";
     els.challenge.value = "";
     els.message.value = "";
@@ -289,9 +424,12 @@
     fail(els.error, "");
     fail(els.errorVerify, "");
 
+    renderMedia();
     show("connect");
     els.code.focus();
   }
+
+  /* ---- links, messages and apps ---- */
 
   function appendBubble(text, isError) {
     var item = document.createElement("li");
@@ -337,12 +475,33 @@
     els.message.value = "";
     appendBubble(text);
 
+    if (link) {
+      media.active = true;
+      media.state = "loading";
+      media.title = link;
+      media.position = 0;
+      media.duration = 0;
+      media.stamp = 0;
+      renderMedia();
+    }
+
     publish(
       link
         ? { type: "media", url: link }
         : { type: "message", text: text.slice(0, 280) }
     ).catch(function () {
       appendBubble("Not sent — check your connection.", true);
+    });
+  }
+
+  function launchApp(button) {
+    var id = button.getAttribute("data-app");
+    var name = button.textContent;
+
+    appendBubble("Opening " + name + " on your TV");
+
+    publish({ type: "app", app: id }).catch(function () {
+      appendBubble("Couldn't open " + name + ".", true);
     });
   }
 
@@ -363,6 +522,33 @@
   els.composer.addEventListener("submit", send);
   document.getElementById("start-over").addEventListener("click", reset);
   document.getElementById("reset").addEventListener("click", reset);
+
+  els.toggle.addEventListener("click", togglePlayback);
+  els.stop.addEventListener("click", stopPlayback);
+  els.toggle.innerHTML = ICON_PLAY;
+  els.stop.innerHTML = ICON_STOP;
+
+  els.seek.addEventListener("input", function () {
+    media.seeking = true;
+    els.position.textContent = clock(Number(els.seek.value));
+  });
+
+  els.seek.addEventListener("change", function () {
+    var position = Number(els.seek.value);
+
+    media.seeking = false;
+    media.position = position;
+    media.stamp = Date.now();
+    publish({ type: "control", action: "seek", position: position }).catch(function () {
+      appendBubble("Seek didn't reach the screen.", true);
+    });
+  });
+
+  Array.prototype.forEach.call(document.querySelectorAll("[data-app]"), function (button) {
+    button.addEventListener("click", function () {
+      launchApp(button);
+    });
+  });
 
   show("connect");
 })(window);

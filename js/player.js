@@ -5,10 +5,12 @@
  * YouTube player's state), never by a timer. Nothing is simulated: if a link
  * fails, the failure comes from the element or the player itself.
  *
- * The device profile caps the quality: YouTube is asked for at most the
- * screen's limit (720p on a Raspberry Pi 3 B, 1080p on most machines, 4K only
- * on capable hardware). Direct files cannot be transcoded in a browser, so a
- * larger source is reported instead.
+ * The phone controls playback through the Cast module: pause, play, stop and
+ * seek. Playback state is reported back on every real state change.
+ *
+ * Browsers require a gesture before audio may play; the page unlocks sound on
+ * the first interaction it gets, and the kiosk launcher passes Chromium's
+ * --autoplay-policy flag so a wall-mounted screen starts with sound.
  *
  * Exposes window.Ambient.Player.
  */
@@ -136,7 +138,9 @@
     this.maxHeight = device.maxHeight || 1080;
     this.active = false;
     this.started = false;
+    this.title = "";
     this.yt = null;
+    this.onUpdate = null;
     this.timeout = 0;
     this.errorTimer = 0;
 
@@ -165,6 +169,8 @@
         name = "Video";
       }
 
+      self.title = name;
+
       if (isFinite(video.duration) && video.duration > 0) {
         self.els.title.textContent = name;
         self.loadingView(name, "Loading…", self.buffered(), self.qualityNote());
@@ -190,16 +196,28 @@
       self.started = true;
       global.clearTimeout(self.timeout);
       self.els.loading.hidden = true;
+      self.emit("playing");
     });
 
     video.addEventListener("waiting", function () {
       if (self.active && self.started) {
-        self.loadingView(self.els.title.textContent || "Video", "Buffering…", self.buffered(), self.qualityNote());
+        self.loadingView(self.title || "Video", "Buffering…", self.buffered(), self.qualityNote());
+        self.emit("buffering");
       }
     });
 
+    video.addEventListener("play", function () {
+      if (self.active) self.emit("playing");
+    });
+
+    video.addEventListener("pause", function () {
+      if (self.active && !self.closing) self.emit("paused");
+    });
+
     video.addEventListener("ended", function () {
-      if (self.active) self.close();
+      if (!self.active) return;
+      self.emit("ended");
+      self.close();
     });
 
     video.addEventListener("error", function () {
@@ -213,6 +231,45 @@
     return this.quality + " max on this device";
   };
 
+  Player.prototype.position = function () {
+    if (!this.active) return 0;
+
+    if (this.yt && this.yt.getCurrentTime) {
+      try {
+        return this.yt.getCurrentTime() || 0;
+      } catch (error) {
+        return 0;
+      }
+    }
+
+    return this.els.video.currentTime || 0;
+  };
+
+  Player.prototype.duration = function () {
+    if (!this.active) return 0;
+
+    if (this.yt && this.yt.getDuration) {
+      try {
+        return this.yt.getDuration() || 0;
+      } catch (error) {
+        return 0;
+      }
+    }
+
+    return isFinite(this.els.video.duration) ? this.els.video.duration : 0;
+  };
+
+  Player.prototype.emit = function (state) {
+    if (!this.onUpdate) return;
+
+    this.onUpdate({
+      state: state,
+      position: this.position(),
+      duration: this.duration(),
+      title: this.title || ""
+    });
+  };
+
   Player.prototype.open = function (value) {
     var info = parse(value);
 
@@ -221,6 +278,7 @@
     this.close();
     this.active = true;
     this.started = false;
+    this.title = "";
 
     this.els.video.muted = false;
     this.els.video.hidden = true;
@@ -233,6 +291,7 @@
     this.els.overlay.classList.add("is-visible");
 
     this.watchdog();
+    this.emit("loading");
 
     if (info.kind === "youtube") this.openYouTube(info);
     else if (info.kind === "hls") this.fail("HLS (.m3u8) streams are not supported by this browser.");
@@ -265,7 +324,7 @@
       if (video.error) return;
 
       video.muted = true;
-      self.els.note.textContent = "Muted · browser blocked autoplay with sound";
+      self.els.note.textContent = "Muted · tap the screen once to enable sound";
       video.play().catch(function () {
         if (!video.error) self.fail("This browser blocked playback.");
       });
@@ -324,14 +383,23 @@
 
   Player.prototype.youtubeReady = function (player) {
     var self = this;
+    var data;
 
     player.playVideo();
+
+    try {
+      data = player.getVideoData ? player.getVideoData() : null;
+      if (data && data.title) {
+        this.title = data.title;
+        this.els.title.textContent = data.title;
+      }
+    } catch (error) {}
 
     global.setTimeout(function () {
       if (!self.active || self.started) return;
       if (player.getPlayerState && player.getPlayerState() !== 1) {
         player.mute();
-        self.els.note.textContent = "Muted · browser blocked autoplay with sound";
+        self.els.note.textContent = "Muted · tap the screen once to enable sound";
         player.playVideo();
       }
     }, 1600);
@@ -344,10 +412,97 @@
       this.started = true;
       global.clearTimeout(this.timeout);
       this.els.loading.hidden = true;
+      this.emit("playing");
+    } else if (state === 2) {
+      this.emit("paused");
     } else if (state === 3) {
       this.loadingView("YouTube", "Buffering…", -1, this.qualityNote());
+      this.emit("buffering");
     } else if (state === 0) {
+      this.emit("ended");
       this.close();
+    }
+  };
+
+  Player.prototype.pause = function () {
+    if (!this.active) return;
+
+    if (this.yt && this.yt.pauseVideo) this.yt.pauseVideo();
+    else this.els.video.pause();
+  };
+
+  Player.prototype.play = function () {
+    if (!this.active) return;
+
+    if (this.yt && this.yt.playVideo) {
+      this.yt.playVideo();
+      return;
+    }
+
+    this.els.video.play().catch(function () {});
+  };
+
+  Player.prototype.seek = function (position) {
+    if (!this.active || !isFinite(position) || position < 0) return;
+
+    if (this.yt && this.yt.seekTo) {
+      this.yt.seekTo(position, true);
+      return;
+    }
+
+    if (isFinite(this.els.video.duration)) {
+      this.els.video.currentTime = Math.min(position, this.els.video.duration);
+    }
+  };
+
+  Player.prototype.stop = function () {
+    this.close();
+  };
+
+  Player.prototype.status = function () {
+    var video = this.els.video;
+    var state = "closed";
+
+    if (this.active) {
+      if (this.yt && this.yt.getPlayerState) {
+        try {
+          state = { 0: "ended", 1: "playing", 2: "paused", 3: "buffering" }[this.yt.getPlayerState()] || "loading";
+        } catch (error) {
+          state = "loading";
+        }
+      } else if (video.paused) {
+        state = this.started ? "paused" : "loading";
+      } else {
+        state = "playing";
+      }
+    }
+
+    return {
+      state: state,
+      position: this.position(),
+      duration: this.duration(),
+      title: this.title || ""
+    };
+  };
+
+  /* Chrome only allows audio after a gesture. The first tap or key press on
+     the screen lifts the mute; the kiosk launcher avoids needing it. */
+  Player.prototype.unlockAudio = function () {
+    if (!this.active) return;
+
+    this.els.note.textContent = this.qualityNote();
+
+    if (this.yt && this.yt.unMute) {
+      try {
+        this.yt.unMute();
+        this.yt.setVolume(100);
+      } catch (error) {}
+      return;
+    }
+
+    if (this.els.video.muted) {
+      this.els.video.muted = false;
+      this.els.video.play().catch(function () {});
     }
   };
 
@@ -395,6 +550,7 @@
     this.els.note.textContent = "";
     this.fill(-1);
     this.els.bar.classList.remove("is-indeterminate");
+    this.emit("error");
 
     global.clearTimeout(this.errorTimer);
     this.errorTimer = global.setTimeout(function () {
@@ -408,6 +564,7 @@
     if (!this.active) return;
 
     this.active = false;
+    this.closing = true;
     global.clearTimeout(this.timeout);
     global.clearTimeout(this.errorTimer);
 
@@ -425,9 +582,13 @@
     this.els.frame.hidden = true;
     this.els.loading.classList.remove("is-error");
     this.els.overlay.classList.remove("is-visible");
+    this.emit("closed");
 
     global.setTimeout(function () {
-      if (!self.active) self.els.overlay.hidden = true;
+      if (!self.active) {
+        self.els.overlay.hidden = true;
+        self.closing = false;
+      }
     }, 420);
   };
 
