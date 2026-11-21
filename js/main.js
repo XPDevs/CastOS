@@ -1,9 +1,11 @@
 /*
- * Main — boot, then wire the playlist, clock and slideshow together, and
- * handle fullscreen.
+ * Main — boot, then wire the playlist, clock, slideshow and cast badge.
  *
  * Google's ambient slideshow speeds are 5 s, 10 s, 30 s, 1 m, 3 m, 5 m and
  * 10 m; this runs at 30 s, the standard speed.
+ *
+ * The TV itself has no mouse or keyboard controls: casting, pairing and
+ * messages all arrive over the network.
  */
 (function () {
   "use strict";
@@ -18,6 +20,19 @@
     : [];
 
   document.documentElement.style.setProperty("--fade", CROSSFADE_MS + "ms");
+
+  function startCast() {
+    if (!window.Ambient.Cast) return;
+
+    new window.Ambient.Cast({
+      badge: document.getElementById("cast"),
+      code: document.getElementById("cast-code"),
+      panel: document.getElementById("cast-panel"),
+      eyebrow: document.getElementById("cast-panel-eyebrow"),
+      headline: document.getElementById("cast-panel-headline"),
+      sub: document.getElementById("cast-panel-sub")
+    }).start();
+  }
 
   function startAmbient() {
     new window.Ambient.Clock(
@@ -34,27 +49,9 @@
     } else if (window.console) {
       console.warn("ambient: playlist is empty");
     }
+
+    startCast();
   }
-
-  function enterFullscreen() {
-    var element = document.documentElement;
-    var request = element.requestFullscreen || element.webkitRequestFullscreen ||
-      element.mozRequestFullScreen || element.msRequestFullscreen;
-    var result;
-
-    if (document.fullscreenElement || document.webkitFullscreenElement ||
-        document.mozFullScreenElement || document.msFullscreenElement)
-      return;
-
-    if (!request) return;
-    result = request.call(element);
-    if (result && typeof result.catch === "function") result.catch(function () {});
-  }
-
-  document.addEventListener("click", enterFullscreen);
-  document.addEventListener("keydown", function (event) {
-    if (event.key === "f" || event.key === "F") enterFullscreen();
-  });
 
   /* The boot screen hands over to the screensaver when the animation ends;
      if it cannot run, the screensaver starts anyway. */

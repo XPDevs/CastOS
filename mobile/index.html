@@ -1,0 +1,68 @@
+<!doctype html>
+<html lang="en">
+<head>
+  <meta charset="utf-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover">
+  <meta name="color-scheme" content="dark">
+  <meta name="theme-color" content="#08090d">
+  <title>CastOS Connect</title>
+  <link rel="stylesheet" href="css/app.css">
+</head>
+<body>
+  <div class="app">
+    <header class="topbar">
+      <svg class="topbar__icon" viewBox="0 0 24 24" aria-hidden="true" focusable="false">
+        <path fill="currentColor" d="M21 3H3c-1.1 0-2 .9-2 2v3h2V5h18v14h-7v2h7c1.1 0 2-.9 2-2V5c0-1.1-.9-2-2-2zM1 18v3h3c0-1.66-1.34-3-3-3zm0-4v2c2.76 0 5 2.24 5 5h2c0-3.87-3.13-7-7-7zm0-4v2c4.97 0 9 4.03 9 9h2c0-6.08-4.93-11-11-11z"/>
+      </svg>
+      <span class="topbar__name">CastOS</span>
+      <span class="topbar__tag" id="topbar-tag">Connect</span>
+    </header>
+
+    <main class="card">
+      <form class="step" id="step-connect">
+        <h1>Connect to your screen</h1>
+        <p class="hint">Type the 11-digit code from the top corner of your TV, then choose a pairing password.</p>
+
+        <label class="field">
+          <span>Device code</span>
+          <input id="code" inputmode="numeric" autocomplete="one-time-code" maxlength="11" placeholder="12345678901">
+        </label>
+
+        <label class="field">
+          <span>Pairing password</span>
+          <input id="password" type="password" inputmode="numeric" maxlength="8" placeholder="4+ digits">
+        </label>
+
+        <button class="button" id="connect" type="submit">Connect</button>
+        <p class="error" id="error" role="alert"></p>
+      </form>
+
+      <form class="step" id="step-verify" hidden>
+        <h1>Verify this phone</h1>
+        <p class="hint">Your TV is showing a 4-digit password. Enter it here to finish pairing.</p>
+
+        <input class="pin" id="challenge" inputmode="numeric" maxlength="4" autocomplete="off" placeholder="0000">
+
+        <button class="button" id="verify" type="submit">Pair</button>
+        <p class="error" id="error-verify" role="alert"></p>
+      </form>
+
+      <section class="step" id="step-paired" hidden>
+        <h1>Connected</h1>
+        <p class="hint" id="paired-to"></p>
+
+        <form class="composer" id="composer">
+          <input id="message" maxlength="280" autocomplete="off" placeholder="Message your screen">
+          <button class="button button--send" type="submit">Send</button>
+        </form>
+
+        <ul class="sent" id="sent"></ul>
+      </section>
+    </main>
+
+    <p class="foot">Pairing runs over a temporary ntfy.sh topic.</p>
+  </div>
+
+  <script src="js/app.js"></script>
+</body>
+</html>

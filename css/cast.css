@@ -1,0 +1,125 @@
+/* Cast badge, pairing panel and message panel. */
+
+.cast {
+  position: fixed;
+  top: 3.2vh;
+  right: 3.4vh;
+  z-index: 3;
+  display: flex;
+  align-items: center;
+  gap: 1.1vh;
+  padding: 0.9vh 2vh 0.9vh 1.5vh;
+  border: 1px solid rgba(255, 255, 255, 0.14);
+  border-radius: 999px;
+  background: rgba(10, 12, 18, 0.4);
+  -webkit-backdrop-filter: blur(14px);
+  backdrop-filter: blur(14px);
+  color: #fff;
+  font-family: "Google Sans Flex", "Helvetica Neue", Arial, sans-serif;
+  opacity: 0;
+  transform: translateY(-0.8vh);
+  transition: opacity 900ms ease, transform 900ms ease;
+  pointer-events: none;
+  user-select: none;
+  -webkit-user-select: none;
+}
+
+.cast.is-visible {
+  opacity: 1;
+  transform: none;
+}
+
+.cast__icon {
+  width: 2.5vh;
+  height: 2.5vh;
+  color: rgba(255, 255, 255, 0.88);
+  transition: color 500ms ease;
+}
+
+.cast.is-paired .cast__icon {
+  color: #8ab4f8;
+}
+
+.cast__code {
+  font-size: 2.1vh;
+  font-weight: 400;
+  letter-spacing: 0.2em;
+  font-variant-numeric: tabular-nums;
+  white-space: nowrap;
+}
+
+/* Panel used for pairing, messages and short status cards. */
+
+.cast-panel {
+  position: fixed;
+  top: 0;
+  left: 0;
+  right: 0;
+  bottom: 0;
+  z-index: 4;
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  justify-content: center;
+  gap: 2vh;
+  padding: 6vh 8vw;
+  background: rgba(4, 6, 12, 0.55);
+  -webkit-backdrop-filter: blur(20px);
+  backdrop-filter: blur(20px);
+  color: #fff;
+  font-family: "Google Sans Flex", "Helvetica Neue", Arial, sans-serif;
+  text-align: center;
+  opacity: 0;
+  transition: opacity 450ms ease;
+  pointer-events: none;
+  user-select: none;
+  -webkit-user-select: none;
+}
+
+.cast-panel[hidden] {
+  display: none;
+}
+
+.cast-panel.is-visible {
+  opacity: 1;
+}
+
+.cast-panel__eyebrow {
+  font-size: 1.9vh;
+  font-weight: 400;
+  letter-spacing: 0.3em;
+  text-transform: uppercase;
+  opacity: 0.65;
+}
+
+.cast-panel__headline {
+  max-width: 72vw;
+  font-size: 6.4vh;
+  font-weight: 400;
+  line-height: 1.18;
+  letter-spacing: -0.01em;
+  overflow-wrap: anywhere;
+}
+
+.cast-panel__headline:empty {
+  display: none;
+}
+
+.cast-panel__headline.is-code {
+  font-size: 13vh;
+  font-variant-numeric: tabular-nums;
+  letter-spacing: 0.32em;
+  padding-left: 0.32em;
+}
+
+.cast-panel__sub {
+  max-width: 58vw;
+  font-size: 2.5vh;
+  font-weight: 300;
+  line-height: 1.35;
+  opacity: 0.82;
+}
+
+.cast-panel__sub:empty {
+  display: none;
+}

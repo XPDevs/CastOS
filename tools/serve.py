@@ -23,8 +23,8 @@ class Handler(BaseHTTPRequestHandler):
     def do_GET(self):
         path = urllib.parse.urlparse(self.path).path
 
-        if path == "/":
-            path = "/index.html"
+        if path.endswith("/"):
+            path += "index.html"
 
         resolved = os.path.normpath(os.path.join(ROOT, path.lstrip("/")))
         if resolved != ROOT and not resolved.startswith(ROOT + os.sep):
