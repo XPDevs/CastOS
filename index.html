@@ -1,0 +1,34 @@
+<!doctype html>
+<html lang="en">
+<head>
+  <meta charset="utf-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1">
+  <meta name="color-scheme" content="dark">
+  <title>Ambient</title>
+  <link rel="stylesheet" href="css/base.css">
+  <link rel="stylesheet" href="css/boot.css">
+  <link rel="stylesheet" href="css/clock.css">
+  <link rel="stylesheet" href="css/slideshow.css">
+</head>
+<body>
+  <div class="boot" id="boot" aria-hidden="true">
+    <img class="boot__frame" id="boot-frame" alt="">
+  </div>
+
+  <main class="stage">
+    <img class="slide" id="slide-a" alt="">
+    <img class="slide" id="slide-b" alt="">
+  </main>
+
+  <div class="clock">
+    <span class="clock__time" id="clock-time">--:--</span>
+    <span class="clock__date" id="clock-date"></span>
+  </div>
+
+  <script src="js/playlist.js"></script>
+  <script src="js/clock.js"></script>
+  <script src="js/slideshow.js"></script>
+  <script src="js/boot.js"></script>
+  <script src="js/main.js"></script>
+</body>
+</html>

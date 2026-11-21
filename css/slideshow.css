@@ -1,0 +1,17 @@
+/* Full-bleed wallpaper layers with a crossfade. */
+
+.slide {
+  position: absolute;
+  top: 0;
+  left: 0;
+  width: 100%;
+  height: 100%;
+  object-fit: cover;
+  opacity: 0;
+  transition: opacity var(--fade) ease-in-out;
+  will-change: opacity;
+}
+
+.slide.is-active {
+  opacity: 1;
+}

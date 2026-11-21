@@ -1,0 +1,49 @@
+/* Google Sans faces and the ambient clock. */
+
+@font-face {
+  font-family: "Google Sans Flex";
+  src: url("../assets/fonts/GoogleSansFlex-Regular.ttf") format("truetype");
+  font-weight: 400;
+  font-style: normal;
+  font-display: swap;
+}
+
+@font-face {
+  font-family: "Google Sans Flex";
+  src: url("../assets/fonts/GoogleSansFlex-Light.ttf") format("truetype");
+  font-weight: 300;
+  font-style: normal;
+  font-display: swap;
+}
+
+.clock {
+  position: fixed;
+  right: var(--clock-right);
+  bottom: var(--clock-bottom);
+  display: flex;
+  flex-direction: column;
+  align-items: flex-end;
+  gap: 1.4vh;
+  color: #fff;
+  font-family: "Google Sans Flex", "Helvetica Neue", Arial, sans-serif;
+  font-weight: 400;
+  text-align: right;
+  text-shadow: 0 0.25vh 1.2vh rgba(0, 0, 0, 0.55);
+  user-select: none;
+  -webkit-user-select: none;
+}
+
+.clock__time {
+  font-size: 15vh;
+  font-weight: 400;
+  line-height: 1;
+  letter-spacing: -0.01em;
+  font-variant-numeric: tabular-nums;
+}
+
+.clock__date {
+  font-size: 4vh;
+  font-weight: 300;
+  line-height: 1;
+  opacity: 0.95;
+}

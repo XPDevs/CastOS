@@ -1,0 +1,29 @@
+/* Page reset and stage layout. */
+
+:root {
+  --fade: 1500ms;
+  --clock-right: 4.5vw;
+  --clock-bottom: 7vh;
+}
+
+* {
+  box-sizing: border-box;
+}
+
+html,
+body {
+  margin: 0;
+  width: 100%;
+  height: 100%;
+  overflow: hidden;
+  background: #060910;
+  cursor: none;
+}
+
+.stage {
+  position: fixed;
+  top: 0;
+  left: 0;
+  width: 100%;
+  height: 100%;
+}
