@@ -37,6 +37,22 @@
     note: document.getElementById("player-note")
   });
 
+  var music = new window.Ambient.Music({
+    overlay: document.getElementById("music"),
+    backdrop: document.getElementById("music-backdrop"),
+    art: document.getElementById("music-art"),
+    title: document.getElementById("music-title"),
+    artist: document.getElementById("music-artist"),
+    album: document.getElementById("music-album"),
+    fill: document.getElementById("music-fill"),
+    elapsed: document.getElementById("music-elapsed"),
+    total: document.getElementById("music-total"),
+    status: document.getElementById("music-status"),
+    dot: document.getElementById("music-dot"),
+    next: document.getElementById("music-next"),
+    audio: document.getElementById("music-audio")
+  });
+
   function startCast() {
     if (!window.Ambient.Cast) return;
 
@@ -47,7 +63,8 @@
       eyebrow: document.getElementById("cast-panel-eyebrow"),
       headline: document.getElementById("cast-panel-headline"),
       sub: document.getElementById("cast-panel-sub"),
-      player: player
+      player: player,
+      music: music
     }).start();
   }
 
@@ -77,6 +94,7 @@
     if (unlocked) return;
     unlocked = true;
     player.unlockAudio();
+    music.unlockAudio();
   }
 
   ["pointerdown", "keydown", "touchstart"].forEach(function (type) {

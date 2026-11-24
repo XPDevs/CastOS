@@ -102,6 +102,7 @@
   function Cast(els) {
     this.els = els;
     this.player = els.player || null;
+    this.music = els.music || null;
     this.code = deviceCode();
     this.topic = this.code;
     this.session = "";
@@ -124,6 +125,12 @@
     if (this.player) {
       this.player.onUpdate = function (update) {
         self.publishPlayback(update);
+      };
+    }
+
+    if (this.music) {
+      this.music.onUpdate = function (update) {
+        self.publishMusic(update);
       };
     }
   };
@@ -188,6 +195,9 @@
     else if (message.type === "verify") this.verify(message);
     else if (message.type === "message") this.showMessage(message);
     else if (message.type === "media") this.playMedia(message);
+    else if (message.type === "music") this.playMusic(message);
+    else if (message.type === "music-queue") this.queueMusic(message);
+    else if (message.type === "music-control") this.controlMusic(message);
     else if (message.type === "control") this.control(message);
     else if (message.type === "app") this.launchApp(message);
     else if (message.type === "unpair") this.unpair(message);
@@ -268,6 +278,9 @@
     if (!this.token || String(message.token) !== this.token) return;
     if (!this.player || typeof message.url !== "string") return;
 
+    // A music session and a video session never share the screen.
+    if (this.music) this.music.stop();
+
     if (!this.player.open(message.url)) {
       this.showPanel(
         "Can't open that link",
@@ -277,6 +290,40 @@
         TOAST_MS
       );
     }
+  };
+
+  /* -------- Spotless music --------
+
+     The phone sends the track that should play plus the ones after it, so the screen can keep
+     going if the socket hiccups. Nothing here guesses: the audio element and this module are the
+     only source of playback state. */
+
+  Cast.prototype.playMusic = function (message) {
+    if (!this.authorised(message) || !this.music) return;
+
+    if (this.player) this.player.stop();
+
+    if (!this.music.open(message)) {
+      this.showPanel(
+        "Can't play that track",
+        "The phone sent no audio link",
+        "",
+        false,
+        TOAST_MS
+      );
+    }
+  };
+
+  Cast.prototype.queueMusic = function (message) {
+    if (!this.authorised(message) || !this.music) return;
+
+    this.music.add(message.add || [], !!message.next);
+  };
+
+  Cast.prototype.controlMusic = function (message) {
+    if (!this.authorised(message) || !this.music) return;
+
+    this.music.control(message);
   };
 
   /* Playback controls come from the paired phone only. */
@@ -326,6 +373,22 @@
     });
   };
 
+  Cast.prototype.publishMusic = function (update) {
+    if (!this.paired || !this.token) return;
+
+    this.publish({
+      type: "playback",
+      session: this.session,
+      token: this.token,
+      state: update.state,
+      position: update.position,
+      duration: update.duration,
+      title: update.title,
+      trackId: update.trackId,
+      index: update.index
+    });
+  };
+
   /* The phone's reset clears the pairing here too, so the next phone starts
      from a clean screen. */
   Cast.prototype.unpair = function (message) {
@@ -345,7 +408,7 @@
   Cast.prototype.publish = function (payload) {
     var body = {
       app: APP,
-      v: 1,
+      v: 2,
       from: "tv",
       type: payload.type,
       session: payload.session || "",
@@ -354,6 +417,8 @@
       position: payload.position || 0,
       duration: payload.duration || 0,
       title: payload.title || "",
+      trackId: payload.trackId || "",
+      index: payload.index || 0,
       at: Date.now()
     };
 

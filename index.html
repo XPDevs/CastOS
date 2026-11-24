@@ -11,6 +11,7 @@
   <link rel="stylesheet" href="css/slideshow.css">
   <link rel="stylesheet" href="css/cast.css">
   <link rel="stylesheet" href="css/player.css">
+  <link rel="stylesheet" href="css/music.css">
   <link rel="stylesheet" href="css/profile.css">
 </head>
 <body>
@@ -54,10 +55,36 @@
     </div>
   </div>
 
+  <div class="music" id="music" aria-hidden="true" hidden>
+    <div class="music__backdrop" id="music-backdrop"></div>
+    <div class="music__stage">
+      <div class="music__art-wrap">
+        <img class="music__art is-empty" id="music-art" alt="">
+      </div>
+      <div class="music__meta">
+        <div class="music__brand">Spotless</div>
+        <div class="music__title" id="music-title">Ready to cast</div>
+        <div class="music__artist" id="music-artist">Pick a song in Spotless</div>
+        <div class="music__album" id="music-album"></div>
+        <div class="music__bar"><div class="music__fill" id="music-fill"></div></div>
+        <div class="music__times"><span id="music-elapsed">0:00</span><span id="music-total">0:00</span></div>
+        <div class="music__footer">
+          <span class="music__state">
+            <span class="music__dot is-off" id="music-dot"></span>
+            <span id="music-status">Idle</span>
+          </span>
+        </div>
+        <div class="music__next" id="music-next"></div>
+      </div>
+    </div>
+    <audio id="music-audio" preload="auto"></audio>
+  </div>
+
   <script src="js/playlist.js"></script>
   <script src="js/clock.js"></script>
   <script src="js/slideshow.js"></script>
   <script src="js/player.js"></script>
+  <script src="js/music.js"></script>
   <script src="js/cast.js"></script>
   <script src="js/main.js"></script>
 </body>

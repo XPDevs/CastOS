@@ -1,0 +1,224 @@
+/* The Spotless music player on a CastOS screen.
+
+   Audio only: big artwork, title, artist, progress and the queue. The stage sits over the
+   ambient wallpaper and is hidden until a phone sends music. */
+
+.music {
+  position: fixed;
+  top: 0;
+  left: 0;
+  right: 0;
+  bottom: 0;
+  z-index: 6;
+  opacity: 0;
+  transition: opacity 420ms ease;
+  pointer-events: none;
+  background: #0b0b0c;
+  font-family: "Google Sans Flex", "Google Sans", "Helvetica Neue", Arial, sans-serif;
+  color: #f6f6f6;
+}
+
+.music[hidden] {
+  display: none;
+}
+
+.music.is-visible {
+  opacity: 1;
+}
+
+.music__backdrop {
+  position: absolute;
+  top: -8%;
+  left: -8%;
+  right: -8%;
+  bottom: -8%;
+  background-position: center;
+  background-size: cover;
+  filter: blur(90px) saturate(120%);
+  opacity: 0.32;
+  transform: scale(1.06);
+}
+
+.music__backdrop::after {
+  content: "";
+  position: absolute;
+  top: 0;
+  left: 0;
+  right: 0;
+  bottom: 0;
+  background: radial-gradient(90% 90% at 25% 15%, rgba(30, 215, 96, 0.14) 0%, rgba(11, 11, 12, 0.9) 62%);
+}
+
+.music__stage {
+  position: relative;
+  display: flex;
+  align-items: center;
+  gap: 7vh;
+  height: 100%;
+  padding: 0 8vw;
+}
+
+.music__art-wrap {
+  flex: 0 0 auto;
+  width: min(46vh, 46vw);
+  height: min(46vh, 46vw);
+}
+
+.music__art {
+  width: 100%;
+  height: 100%;
+  object-fit: cover;
+  border-radius: 2.2vh;
+  background: linear-gradient(135deg, #232323, #141414);
+  box-shadow: 0 3vh 8vh rgba(0, 0, 0, 0.62);
+}
+
+.music__art.is-empty {
+  opacity: 0.28;
+}
+
+.music__meta {
+  flex: 1 1 auto;
+  min-width: 0;
+}
+
+.music__brand {
+  font-size: 1.4vh;
+  letter-spacing: 0.46em;
+  font-weight: 700;
+  text-transform: uppercase;
+  color: #1ed760;
+}
+
+.music__title {
+  margin-top: 2.2vh;
+  font-size: clamp(30px, 5.6vh, 64px);
+  line-height: 1.06;
+  font-weight: 700;
+  letter-spacing: -0.02em;
+  display: -webkit-box;
+  -webkit-line-clamp: 2;
+  -webkit-box-orient: vertical;
+  overflow: hidden;
+}
+
+.music__artist {
+  margin-top: 1.4vh;
+  font-size: clamp(16px, 2.3vh, 26px);
+  color: #b9b9b9;
+  white-space: nowrap;
+  overflow: hidden;
+  text-overflow: ellipsis;
+}
+
+.music__album {
+  margin-top: 0.8vh;
+  font-size: clamp(13px, 1.8vh, 19px);
+  color: #8c8c8c;
+  white-space: nowrap;
+  overflow: hidden;
+  text-overflow: ellipsis;
+}
+
+.music__bar {
+  margin-top: 4.4vh;
+  height: 0.55vh;
+  min-height: 4px;
+  border-radius: 999px;
+  background: rgba(255, 255, 255, 0.13);
+  overflow: hidden;
+}
+
+.music__fill {
+  height: 100%;
+  width: 0;
+  border-radius: inherit;
+  background: linear-gradient(90deg, #1ed760, #8ff0ab);
+  transition: width 260ms linear;
+}
+
+.music__times {
+  margin-top: 1.1vh;
+  display: flex;
+  justify-content: space-between;
+  font-size: 1.5vh;
+  color: #8c8c8c;
+  font-variant-numeric: tabular-nums;
+}
+
+.music__footer {
+  margin-top: 3vh;
+  display: flex;
+  align-items: center;
+  gap: 1.6vh;
+}
+
+.music__state {
+  display: inline-flex;
+  align-items: center;
+  gap: 1.1vh;
+  font-size: 1.35vh;
+  letter-spacing: 0.14em;
+  text-transform: uppercase;
+  color: #8c8c8c;
+}
+
+.music__dot {
+  width: 0.9vh;
+  height: 0.9vh;
+  min-width: 8px;
+  min-height: 8px;
+  border-radius: 50%;
+  background: #1ed760;
+  box-shadow: 0 0 1.4vh rgba(30, 215, 96, 0.9);
+  transition: background 200ms ease, box-shadow 200ms ease;
+}
+
+.music__dot.is-off {
+  background: #555;
+  box-shadow: none;
+}
+
+.music__next {
+  margin-top: 2.4vh;
+  font-size: 1.4vh;
+  color: #757575;
+  letter-spacing: 0.02em;
+  white-space: nowrap;
+  overflow: hidden;
+  text-overflow: ellipsis;
+}
+
+/* Paused: hold the artwork back a little so the state is readable at a glance. */
+.music:not(.is-playing) .music__art {
+  filter: saturate(70%) brightness(0.82);
+}
+
+@media (max-aspect-ratio: 1/1) {
+  .music__stage {
+    flex-direction: column;
+    justify-content: center;
+    text-align: center;
+    gap: 4vh;
+    padding: 4vh 6vw;
+  }
+
+  .music__art-wrap {
+    width: min(38vh, 62vw);
+    height: min(38vh, 62vw);
+  }
+
+  .music__footer {
+    justify-content: center;
+  }
+}
+
+/* Lite profile: no blur, no saturate filter. */
+html[data-profile="lite"] .music__backdrop {
+  filter: none;
+  opacity: 0.18;
+}
+
+html[data-profile="lite"] .music__fill {
+  transition: none;
+}
